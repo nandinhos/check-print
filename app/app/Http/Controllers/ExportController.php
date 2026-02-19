@@ -61,24 +61,37 @@ class ExportController extends Controller
                 : 0,
         ];
 
-        $top5 = PrintLog::query()
+        $ranking = PrintLog::query()
             ->when($dataInicio, fn ($q) => $q->whereDate('data_impressao', '>=', $dataInicio))
-            ->when($dataFim, fn ($q) => $q->whereDate('data_impressao', '<=', $dataFim))
+            ->when($dataFim,    fn ($q) => $q->whereDate('data_impressao', '<=', $dataFim))
             ->when($filtroUsuario, fn ($q) => $q->where('usuario', 'like', '%' . $filtroUsuario . '%'))
             ->selectRaw('
                 usuario,
-                SUM(CASE WHEN classificacao = "PESSOAL" THEN custo ELSE 0 END) as custo_pessoal,
-                SUM(CASE WHEN classificacao = "PESSOAL" THEN 1 ELSE 0 END) as qtd_pessoal,
-                SUM(CASE WHEN classificacao = "PESSOAL" THEN paginas ELSE 0 END) as paginas_pessoal
+                SUM(CASE WHEN classificacao = "PESSOAL"        THEN 1       ELSE 0 END) as qtd_pessoal,
+                SUM(CASE WHEN classificacao = "PESSOAL"        THEN paginas ELSE 0 END) as paginas_pessoal,
+                SUM(CASE WHEN classificacao = "PESSOAL"        THEN custo   ELSE 0 END) as custo_pessoal,
+                SUM(CASE WHEN classificacao = "ADMINISTRATIVO" THEN 1       ELSE 0 END) as qtd_admin,
+                SUM(CASE WHEN classificacao = "ADMINISTRATIVO" THEN paginas ELSE 0 END) as paginas_admin,
+                SUM(CASE WHEN classificacao = "ADMINISTRATIVO" THEN custo   ELSE 0 END) as custo_admin,
+                SUM(paginas) as total_paginas
             ')
             ->groupBy('usuario')
-            ->orderByDesc('custo_pessoal')
-            ->limit(5)
+            ->orderByDesc('total_paginas')
             ->get();
+
+        $analitico = PrintLog::query()
+            ->when($dataInicio, fn ($q) => $q->whereDate('data_impressao', '>=', $dataInicio))
+            ->when($dataFim,    fn ($q) => $q->whereDate('data_impressao', '<=', $dataFim))
+            ->when($filtroUsuario, fn ($q) => $q->where('usuario', 'like', '%' . $filtroUsuario . '%'))
+            ->orderBy('usuario')
+            ->orderByRaw("CASE WHEN classificacao = 'PESSOAL' THEN 0 ELSE 1 END")
+            ->orderBy('data_impressao')
+            ->get(['usuario', 'documento', 'data_impressao', 'paginas', 'custo', 'classificacao']);
 
         $pdf = Pdf::loadView('reports.executive', [
             'kpis'       => $kpis,
-            'top5'       => $top5,
+            'ranking'    => $ranking,
+            'analitico'  => $analitico,
             'dataInicio' => \Carbon\Carbon::parse($dataInicio)->format('d/m/Y'),
             'dataFim'    => \Carbon\Carbon::parse($dataFim)->format('d/m/Y'),
         ])->setPaper('a4');

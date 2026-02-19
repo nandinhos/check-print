@@ -77,33 +77,81 @@
         </div>
     </div>
 
-    <!-- Top 5 Ofensores -->
+    <!-- Ranking de Impressoes por Usuario -->
     <div class="section">
-        <div class="section-title">Top 5 Usuarios com Maior Custo em Impressoes Pessoais</div>
+        <div class="section-title">Ranking de Impressoes por Usuario</div>
         <table>
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Usuario</th>
-                    <th>Qtd Pessoais</th>
-                    <th>Paginas</th>
-                    <th>Custo Pessoal (R$)</th>
-                    <th>% do Total Pessoal</th>
+                    <th>Qtd Pessoal</th>
+                    <th>Pag. Pessoal</th>
+                    <th>Custo Pessoal</th>
+                    <th>Qtd Admin</th>
+                    <th>Pag. Admin</th>
+                    <th>Custo Admin</th>
+                    <th>Total Pag.</th>
+                    <th>% Pessoal</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($top5 as $i => $row)
+                @foreach($ranking as $i => $row)
                     <tr>
                         <td>{{ $i + 1 }}</td>
                         <td><strong>{{ $row->usuario }}</strong></td>
                         <td>{{ $row->qtd_pessoal }}</td>
                         <td>{{ number_format($row->paginas_pessoal, 0, ',', '.') }}</td>
-                        <td><strong>R$ {{ number_format($row->custo_pessoal, 2, ',', '.') }}</strong></td>
+                        <td>R$ {{ number_format($row->custo_pessoal, 2, ',', '.') }}</td>
+                        <td>{{ $row->qtd_admin }}</td>
+                        <td>{{ number_format($row->paginas_admin, 0, ',', '.') }}</td>
+                        <td>R$ {{ number_format($row->custo_admin, 2, ',', '.') }}</td>
+                        <td><strong>{{ number_format($row->total_paginas, 0, ',', '.') }}</strong></td>
                         <td>
-                            @if($kpis['custo_pessoal'] > 0)
-                                {{ number_format(($row->custo_pessoal / $kpis['custo_pessoal']) * 100, 1) }}%
+                            @if($row->total_paginas > 0)
+                                {{ number_format(($row->paginas_pessoal / $row->total_paginas) * 100, 1) }}%
                             @else
                                 0%
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Listagem Analitica por Usuario -->
+    <div class="section" style="page-break-before: always;">
+        <div class="section-title">Listagem Analitica por Usuario</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data/Hora</th>
+                    <th>Documento</th>
+                    <th>Pag.</th>
+                    <th>Custo</th>
+                    <th>Tipo</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php $usuarioAtual = null; @endphp
+                @foreach($analitico as $log)
+                    @if($usuarioAtual !== $log->usuario)
+                        @php $usuarioAtual = $log->usuario; @endphp
+                        <tr style="background: #e2e8f0;">
+                            <td colspan="5"><strong>{{ $log->usuario }}</strong></td>
+                        </tr>
+                    @endif
+                    <tr>
+                        <td>{{ \Carbon\Carbon::parse($log->data_impressao)->format('d/m/Y H:i') }}</td>
+                        <td>{{ $log->documento }}</td>
+                        <td>{{ $log->paginas }}</td>
+                        <td>R$ {{ number_format($log->custo, 2, ',', '.') }}</td>
+                        <td>
+                            @if($log->classificacao === 'PESSOAL')
+                                <span class="badge-pessoal">PESSOAL</span>
+                            @else
+                                <span class="badge-admin">ADMIN</span>
                             @endif
                         </td>
                     </tr>
