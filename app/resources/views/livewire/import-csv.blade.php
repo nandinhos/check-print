@@ -16,6 +16,7 @@
             </div>
         </div>
         <a href="{{ route('export.modelo-csv') }}"
+           download
            class="flex items-center gap-1.5 px-4 py-2 bg-primary-900 text-white text-xs font-medium rounded-lg hover:bg-primary-800 transition-colors whitespace-nowrap flex-shrink-0">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
