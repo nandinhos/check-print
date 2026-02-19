@@ -11,4 +11,5 @@ Route::get('/importar', fn () => view('import'))->name('import');
 Route::prefix('exportar')->name('export.')->group(function () {
     Route::get('/excel', [ExportController::class, 'excel'])->name('excel');
     Route::get('/pdf', [ExportController::class, 'pdf'])->name('pdf');
+    Route::get('/modelo-csv', [ExportController::class, 'modeloCsv'])->name('modelo-csv');
 });

@@ -6,9 +6,9 @@ use App\Exports\PrintLogsExport;
 use App\Models\PrintLog;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportController extends Controller
 {
@@ -28,7 +28,7 @@ class ExportController extends Controller
         );
     }
 
-    public function pdf(Request $request): Response
+    public function pdf(Request $request): StreamedResponse
     {
         $dataInicio    = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
         $dataFim       = $request->get('data_fim', now()->format('Y-m-d'));
@@ -86,5 +86,14 @@ class ExportController extends Controller
         $filename = 'relatorio-auditoria-' . now()->format('Ymd-His') . '.pdf';
 
         return $pdf->download($filename);
+    }
+
+    public function modeloCsv(): BinaryFileResponse
+    {
+        $path = resource_path('templates/modelo-impressoes.csv');
+
+        return response()->download($path, 'modelo-impressoes-gap.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 }
