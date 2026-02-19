@@ -97,14 +97,18 @@
             @if($mostrarPreview && count($preview) > 0)
 
                 {{-- Resumo de contagens --}}
-                <div class="mt-5 grid grid-cols-3 gap-3">
+                <div class="mt-5 grid grid-cols-4 gap-3">
                     <div class="bg-slate-50 rounded-lg px-4 py-3 text-center border border-slate-200">
                         <p class="text-2xl font-bold font-mono text-slate-800">{{ number_format($total, 0, ',', '.') }}</p>
                         <p class="text-xs text-slate-500 mt-0.5">Total de linhas</p>
                     </div>
                     <div class="bg-green-50 rounded-lg px-4 py-3 text-center border border-green-200">
                         <p class="text-2xl font-bold font-mono text-green-700">{{ number_format($validos, 0, ',', '.') }}</p>
-                        <p class="text-xs text-green-600 mt-0.5">Linhas validas</p>
+                        <p class="text-xs text-green-600 mt-0.5">A importar</p>
+                    </div>
+                    <div class="rounded-lg px-4 py-3 text-center border {{ $duplicatas > 0 ? 'bg-amber-50 border-amber-300' : 'bg-slate-50 border-slate-200' }}">
+                        <p class="text-2xl font-bold font-mono {{ $duplicatas > 0 ? 'text-amber-700' : 'text-slate-400' }}">{{ number_format($duplicatas, 0, ',', '.') }}</p>
+                        <p class="text-xs {{ $duplicatas > 0 ? 'text-amber-600' : 'text-slate-400' }} mt-0.5">Duplicatas</p>
                     </div>
                     <div class="rounded-lg px-4 py-3 text-center border {{ $invalidos > 0 ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200' }}">
                         <p class="text-2xl font-bold font-mono {{ $invalidos > 0 ? 'text-red-700' : 'text-slate-400' }}">{{ number_format($invalidos, 0, ',', '.') }}</p>
@@ -151,6 +155,51 @@
                     </div>
                 @endif
 
+                {{-- Painel de duplicatas (colapsavel) --}}
+                @if($duplicatas > 0)
+                    <div class="mt-4">
+                        <button
+                            wire:click="$toggle('mostrarDuplicatas')"
+                            class="w-full flex items-center justify-between px-4 py-3 bg-amber-50 border border-amber-300 rounded-lg text-sm hover:bg-amber-100 transition-colors"
+                        >
+                            <span class="font-medium text-amber-800 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                </svg>
+                                {{ $duplicatas }} {{ $duplicatas === 1 ? 'registro ja existe' : 'registros ja existem' }} no banco
+                                — serao ignorados para evitar cobran&ccedil;a dupla
+                            </span>
+                            <svg class="w-4 h-4 text-amber-600 transition-transform {{ $mostrarDuplicatas ? 'rotate-180' : '' }}"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </button>
+
+                        @if($mostrarDuplicatas)
+                            <div class="mt-1 border border-amber-200 rounded-lg overflow-hidden divide-y divide-amber-100 max-h-48 overflow-y-auto">
+                                @foreach($duplicatasPorLinha as $dup)
+                                    <div class="px-4 py-2.5 bg-white flex items-center gap-3">
+                                        <span class="font-mono text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded flex-shrink-0">
+                                            Linha {{ $dup['linha'] }}
+                                        </span>
+                                        <span class="text-xs text-amber-800 flex-1 truncate">
+                                            <strong>{{ $dup['usuario'] }}</strong>
+                                            &mdash; {{ $dup['documento'] }}
+                                        </span>
+                                        <span class="text-xs text-amber-600 font-mono flex-shrink-0">
+                                            {{ \Carbon\Carbon::parse($dup['data'])->format('d/m/Y H:i') }}
+                                            &bull; {{ $dup['paginas'] }} pag.
+                                        </span>
+                                        <span class="text-xs px-1.5 py-0.5 rounded bg-amber-200 text-amber-800 flex-shrink-0">
+                                            {{ $dup['origem'] === 'banco' ? 'no banco' : 'no arquivo' }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
                 {{-- Tabela de preview --}}
                 <div class="mt-5">
                     <p class="text-xs font-medium text-slate-600 mb-2">
@@ -172,43 +221,53 @@
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @foreach($preview as $row)
-                                    <tr class="{{ $row['_valido'] ? 'hover:bg-slate-50' : 'bg-red-50 hover:bg-red-100' }}">
+                                    @php
+                                        $isDup = $row['_duplicata'] ?? false;
+                                        $trClass = ! $row['_valido'] ? 'bg-red-50 hover:bg-red-100'
+                                                 : ($isDup ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-slate-50');
+                                    @endphp
+                                    <tr class="{{ $trClass }}">
                                         <td class="px-2 py-2 text-center font-mono text-slate-400">{{ $row['_linha'] }}</td>
                                         <td class="px-3 py-2 text-center">
-                                            @if($row['_valido'])
+                                            @if(! $row['_valido'])
+                                                <span title="{{ implode(' | ', $row['_erros']) }}"
+                                                      class="inline-flex items-center gap-1 text-red-600 font-medium cursor-help">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                    Erro
+                                                </span>
+                                            @elseif($isDup)
+                                                <span class="inline-flex items-center gap-1 text-amber-700 font-medium">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                    </svg>
+                                                    Dup.
+                                                </span>
+                                            @else
                                                 <span class="inline-flex items-center gap-1 text-green-700 font-medium">
                                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                                                     </svg>
                                                     OK
                                                 </span>
-                                            @else
-                                                <span
-                                                    title="{{ implode(' | ', $row['_erros']) }}"
-                                                    class="inline-flex items-center gap-1 text-red-600 font-medium cursor-help"
-                                                >
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                    Erro
-                                                </span>
                                             @endif
                                         </td>
-                                        <td class="px-3 py-2 {{ $row['_valido'] ? 'text-slate-700' : 'text-red-900' }}">
+                                        <td class="px-3 py-2 {{ ! $row['_valido'] ? 'text-red-900' : ($isDup ? 'text-amber-800' : 'text-slate-700') }}">
                                             {{ $row['usuario'] ?: '—' }}
                                         </td>
-                                        <td class="px-3 py-2 max-w-[180px] {{ $row['_valido'] ? 'text-slate-700' : 'text-red-900' }}">
+                                        <td class="px-3 py-2 max-w-[180px] {{ ! $row['_valido'] ? 'text-red-900' : ($isDup ? 'text-amber-800' : 'text-slate-700') }}">
                                             <span class="truncate block" title="{{ $row['documento'] }}">
                                                 {{ $row['documento'] ?: '—' }}
                                             </span>
                                         </td>
-                                        <td class="px-3 py-2 font-mono {{ $row['_valido'] ? 'text-slate-500' : 'text-red-700' }}">
+                                        <td class="px-3 py-2 font-mono {{ ! $row['_valido'] ? 'text-red-700' : ($isDup ? 'text-amber-700' : 'text-slate-500') }}">
                                             {{ $row['data_impressao'] }}
                                         </td>
-                                        <td class="px-3 py-2 text-right font-mono {{ $row['_valido'] ? 'text-slate-700' : 'text-red-700' }}">
+                                        <td class="px-3 py-2 text-right font-mono {{ ! $row['_valido'] ? 'text-red-700' : ($isDup ? 'text-amber-700' : 'text-slate-700') }}">
                                             {{ $row['paginas'] }}
                                         </td>
-                                        <td class="px-3 py-2 text-right font-mono {{ $row['_valido'] ? 'text-slate-700' : 'text-red-700' }}">
+                                        <td class="px-3 py-2 text-right font-mono {{ ! $row['_valido'] ? 'text-red-700' : ($isDup ? 'text-amber-700' : 'text-slate-700') }}">
                                             R$ {{ number_format($row['custo'], 2, ',', '.') }}
                                         </td>
                                     </tr>
@@ -272,10 +331,15 @@
                     <p class="text-base font-semibold text-slate-800">Importacao concluida!</p>
                     <p class="text-sm text-slate-500 mt-1">
                         <span class="font-mono font-bold text-primary-900">{{ $importados }}</span>
-                        registro(s) importados com classificacao automatica.
+                        registro(s) novos importados com classificacao automatica.
                     </p>
-                    @if($invalidos > 0)
-                        <p class="text-xs text-amber-600 mt-1">{{ $invalidos }} linha(s) com erro foram ignoradas.</p>
+                    @if($duplicatas > 0)
+                        <p class="text-xs text-amber-600 mt-1">
+                            {{ $duplicatas }} registro(s) ja existentes no banco foram ignorados — nenhuma cobranca duplicada sera gerada.
+                        </p>
+                    @endif
+                    @if($ignorados > 0)
+                        <p class="text-xs text-red-500 mt-1">{{ $ignorados }} linha(s) com formato invalido foram ignoradas.</p>
                     @endif
                 </div>
                 <div class="flex items-center gap-3 mt-2">

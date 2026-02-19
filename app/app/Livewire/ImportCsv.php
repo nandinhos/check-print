@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\PrintLog;
 use App\Services\ClassifierService;
 use App\Services\CsvParserService;
+use App\Services\DuplicataService;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -17,22 +18,23 @@ class ImportCsv extends Component
     #[Validate(['file' => 'required|file|mimes:csv,txt|max:51200'])]
     public $file = null;
 
-    public int $importados = 0;
-    public int $total = 0;
-    public int $validos = 0;
-    public int $invalidos = 0;
+    public int $importados   = 0;
+    public int $ignorados    = 0; // linhas invalidas (formato)
+    public int $duplicatas   = 0; // linhas ja existentes no banco
+    public int $total        = 0;
+    public int $validos      = 0;
+    public int $invalidos    = 0;
 
     // 'idle' | 'validating' | 'importing' | 'success' | 'error'
-    public string $status = 'idle';
+    public string $status       = 'idle';
     public string $mensagemErro = '';
 
-    // Preview: primeiras 10 linhas com status de validacao
-    public array $preview = [];
-    // Erros por linha: [{linha, erros[]}]
-    public array $errosPorLinha = [];
-    public bool $mostrarPreview = false;
-    // Expandir painel de erros
-    public bool $mostrarErros = false;
+    public array $preview          = [];
+    public array $errosPorLinha    = [];
+    public array $duplicatasPorLinha = [];
+    public bool  $mostrarPreview   = false;
+    public bool  $mostrarErros     = false;
+    public bool  $mostrarDuplicatas = false;
 
     public function updatedFile(): void
     {
@@ -49,25 +51,39 @@ class ImportCsv extends Component
         $parser  = new CsvParserService();
         $content = file_get_contents($this->file->getRealPath());
 
-        // 1. Validar cabecalho
         $headerInfo = $parser->validateHeaderDetail($content);
         if (! $headerInfo['valid']) {
-            $this->status      = 'error';
+            $this->status       = 'error';
             $this->mensagemErro = 'Cabecalho invalido. Colunas faltando: ' . implode(', ', $headerInfo['missing']) . '. '
                 . 'Use o modelo disponivel para download.';
             return;
         }
 
-        // 2. Parsear com validacao linha a linha
         $result = $parser->parseWithValidation($content);
 
-        $this->total         = $result['total'];
-        $this->validos       = $result['validos'];
-        $this->invalidos     = $result['invalidos'];
+        $this->total     = $result['total'];
+        $this->invalidos = $result['invalidos'];
         $this->errosPorLinha = $result['errors'];
 
-        // Preview: primeiras 10 linhas (com e sem erro)
+        // Verificar duplicatas apenas nas linhas validas
+        $duplicataService = new DuplicataService();
+        $validasRows      = array_filter($result['rows'], fn ($r) => $r['_valido']);
+        $verificado       = $duplicataService->verificarLote(array_values($validasRows));
+
+        $this->validos             = count($verificado['novos']);
+        $this->duplicatas          = count($verificado['duplicatas']);
+        $this->duplicatasPorLinha  = $verificado['duplicatas'];
+        $this->mostrarDuplicatas   = $this->duplicatas > 0;
+
+        // Preview: primeiras 10 linhas (todas, com e sem erro)
         $this->preview = array_slice($result['rows'], 0, 10);
+
+        // Marca no preview quais sao duplicatas
+        $linhasDuplicatas = array_column($verificado['duplicatas'], 'linha');
+        foreach ($this->preview as &$row) {
+            $row['_duplicata'] = in_array($row['_linha'], $linhasDuplicatas);
+        }
+        unset($row);
 
         $this->mostrarPreview = true;
         $this->mostrarErros   = $this->invalidos > 0;
@@ -82,19 +98,23 @@ class ImportCsv extends Component
 
         $this->status     = 'importing';
         $this->importados = 0;
+        $this->ignorados  = 0;
+        $this->duplicatas = 0;
 
-        $parser     = new CsvParserService();
-        $classifier = new ClassifierService();
-        $content    = file_get_contents($this->file->getRealPath());
-        $result     = $parser->parseWithValidation($content);
+        $parser           = new CsvParserService();
+        $classifier       = new ClassifierService();
+        $duplicataService = new DuplicataService();
+        $content          = file_get_contents($this->file->getRealPath());
+        $result           = $parser->parseWithValidation($content);
 
-        DB::transaction(function () use ($result, $classifier) {
-            foreach ($result['rows'] as $row) {
-                // Pular linhas invalidas
-                if (! $row['_valido']) {
-                    continue;
-                }
+        $validasRows = array_filter($result['rows'], fn ($r) => $r['_valido']);
+        $verificado  = $duplicataService->verificarLote(array_values($validasRows));
 
+        $this->ignorados  = $result['invalidos'];
+        $this->duplicatas = count($verificado['duplicatas']);
+
+        DB::transaction(function () use ($verificado, $classifier) {
+            foreach ($verificado['novos'] as $row) {
                 $resultado = $classifier->classifyWithConfidence($row['documento']);
 
                 PrintLog::create([
@@ -112,8 +132,8 @@ class ImportCsv extends Component
             }
         });
 
-        $this->status = 'success';
-        $this->file   = null;
+        $this->status         = 'success';
+        $this->file           = null;
         $this->mostrarPreview = false;
         $this->dispatch('csv-importado', total: $this->importados);
     }
@@ -124,6 +144,8 @@ class ImportCsv extends Component
             'file', 'status', 'mensagemErro', 'preview',
             'mostrarPreview', 'importados', 'total', 'validos',
             'invalidos', 'errosPorLinha', 'mostrarErros',
+            'duplicatas', 'duplicatasPorLinha', 'mostrarDuplicatas',
+            'ignorados',
         ]);
         $this->status = 'idle';
     }
