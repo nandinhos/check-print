@@ -1,9 +1,8 @@
 # ROADMAP DE IMPLEMENTACAO - Catalogador de Impressoes GAP
 
 > Fonte unica de verdade para o projeto check-print
-> Stack: Laravel 12 + Livewire 4 + Alpine.js + Tailwind CSS 4 + Docker + MySQL 8.0
+> Stack: Laravel 12 + TALL Stack + Docker + MySQL 8.0
 > Padrao: TDD obrigatorio | Commits em portugues | YAGNI | DRY
-> Ultima atualizacao: 2026-02-19
 
 ---
 
@@ -14,252 +13,282 @@ Sistema web para auditoria e gestao de custos de impressao corporativa.
 Classifica automaticamente documentos entre "Administrativo" e "Pessoal"
 com base em heuristicas de nomenclatura e gera relatorios gerenciais.
 
-### Stack Definitiva (revisada)
+### Stack Definitiva (Atualizada)
 - Framework: Laravel 12.52
 - UI: Livewire 4.1.4 + Alpine.js (gerenciado pelo Livewire) + Tailwind CSS 4
 - Banco: MySQL 8.0
-- Container: Docker (PHP 8.4-FPM + Nginx + Redis)
-- PHP: 8.4.18
-- Servidor: Nginx 1.29.5
-- Exports: maatwebsite/excel + barryvdh/laravel-dompdf
+- Container: Docker (docker-compose)
+- PHP: 8.4
+- Servidor: Nginx
 
 ---
 
 ## SPRINT 1 - Fundacao e Infraestrutura
 **Objetivo**: Ambiente funcionando, banco modelado, ClassifierService com TDD.
-**Status**: CONCLUIDA
+**Status**: CONCLUIDA em 2026-02-18
+**Testes**: 33 passando
 
 ### 1.1 - Setup Docker + Laravel 12
+**Prioridade**: CRITICA
+
 - [x] Criar docker-compose.yml (PHP 8.4, MySQL 8.0, Nginx, Redis)
-- [x] Instalar Livewire 4 (nao Livewire 3 — decisao revisada)
-- [x] Instalar Tailwind CSS 4 via @tailwindcss/vite
-- [x] Instalar Alpine.js (gerenciado internamente pelo Livewire 4)
+- [x] Inicializar projeto Laravel 12 via Composer
+- [x] Instalar Livewire 4.1.4
+- [x] Instalar e configurar Tailwind CSS 4 + Alpine.js
 - [x] Configurar .env com credenciais do banco
-- [x] Verificar: `docker compose up` sobe tudo (porta 8081)
-- [x] Instalar dependencias: maatwebsite/excel, barryvdh/laravel-dompdf, predis/predis
+- [x] Verificar: `docker-compose up` sobe tudo
 
 ### 1.2 - Modelagem do Banco de Dados
-- [x] Migration: print_logs (usuario, documento, data_impressao, paginas, custo, aplicativo, classificacao, classificacao_origem)
-- [x] Migration: manual_overrides (print_log_id FK, classificacao_anterior, classificacao_nova, alterado_por)
-- [x] Migration: indice unico composto (usuario, data_impressao, paginas) — adicionado no Sprint 2+
-- [x] Model PrintLog com fillable, casts, hasMany ManualOverride
-- [x] Model ManualOverride com relacionamento belongsTo
-- [x] Factory PrintLogFactory para dados de teste
+**Prioridade**: CRITICA
+
+- [x] Migration: print_logs
+- [x] Migration: manual_overrides
+- [x] Model PrintLog com fillable e casts
+- [x] Model ManualOverride com relacionamento
+- [x] Factory para PrintLog (dados de teste)
 
 ### 1.3 - ClassifierService (TDD - Core do Sistema)
-- [x] Criar ClassifierServiceTest (RED) — 25 testes
-- [x] Criar ClassifierService (GREEN) — keywords PESSOAL e fallback ADMINISTRATIVO
+**Prioridade**: CRITICA
+
+- [x] Criar ClassifierServiceTest (RED)
+- [x] Criar ClassifierService (GREEN)
 - [x] Testar: "Boleto Nubank" -> PESSOAL
 - [x] Testar: "Ficha S1 Caetano" -> ADMINISTRATIVO
 - [x] Testar: "Curriculo" -> PESSOAL
 - [x] Testar: documento sem keyword -> ADMINISTRATIVO
-- [x] classifyWithConfidence() retorna classificacao + confianca (ALTA/MEDIA)
-- [x] 25 testes passando, cobertura completa das heuristicas
+- [x] Cobertura 100% das heuristicas (25 testes)
+
+### Decisoes tecnicas tomadas na Sprint 1
+- Livewire 4 (nao 3 como planejado) — decisao durante execucao
+- Tailwind CSS 4 com @theme CSS variables (sem tailwind.config.js)
+- Alpine.js gerenciado pelo Livewire 4 (sem import manual no app.js)
 
 ---
 
 ## SPRINT 2 - Importacao de CSV
-**Objetivo**: Upload de CSV, validacao linha a linha, preview, deteccao de duplicatas.
-**Status**: CONCLUIDA (escopo ampliado)
+**Objetivo**: Upload de CSV, validacao, persistencia no banco.
+**Status**: CONCLUIDA em 2026-02-18/19
+**Testes**: 47 passando ao final
 
-### 2.1 - Modulo de Upload e Parsing
-- [x] CsvParserService com TDD (8 testes)
+### 2.1 - Modulo de Upload
+**Prioridade**: CRITICA
+
+- [x] Livewire Component: ImportCsvComponent (ImportCsv.php)
+- [x] Validacao de colunas obrigatorias (Data, Hora, Usuario, Documento, Paginas, Custo)
 - [x] Suporte a separador ; e ,
-- [x] Parsing de data formato DD/MM/YYYY HH:MM:SS
+- [x] Parsing de data formato DD/MM/YYYY
 - [x] Parsing de custo (virgula -> ponto)
-- [x] Validacao de colunas obrigatorias com validateHeaderDetail()
-- [x] Parsing com validacao linha a linha parseWithValidation()
-- [x] Metadata por linha: _linha, _valido, _erros
-- [x] Livewire Component: ImportCsv com WithFileUploads
+- [x] ClassifierService aplicado em cada linha
+- [x] Arquivo modelo CSV para download (resources/templates/)
 
-### 2.2 - Preview e Feedback
-- [x] Preview das primeiras 10 linhas antes de confirmar
-- [x] Contadores: Total / A importar / Duplicatas / Com erro
-- [x] Painel colapsavel de erros por linha (em vermelho)
-- [x] Painel colapsavel de duplicatas (em amber) com origem (banco/arquivo)
-- [x] Badges OK/Dup./Erro na tabela de preview
-- [x] Loading spinner durante analise do arquivo
-- [x] Mensagem de sucesso com resumo completo
+### 2.2 - Feedback de Importacao
+**Prioridade**: ALTA
 
-### 2.3 - Arquivo Modelo CSV
-- [x] Criar resources/templates/modelo-impressoes.csv
-- [x] Rota exportar/modelo-csv
-- [x] Botao "Baixar Modelo" no banner da pagina de importacao
+- [x] 4 contadores: Total / A importar / Duplicatas / Com erro
+- [x] Preview das primeiras 10 linhas com badges OK/Dup./Erro
+- [x] Painel colapsavel de erros por linha
+- [x] Painel colapsavel de duplicatas (amber) com origem banco/arquivo
+- [x] Validacao: arquivo vazio, colunas faltando, formato invalido
 
-### 2.4 - Deteccao de Duplicatas (adicionado)
+### 2.3 - Deteccao de Duplicatas (escopo expandido)
+**Prioridade**: ALTA (nao estava no ROADMAP original)
+
 - [x] DuplicataService com TDD (10 testes)
-- [x] Deteccao contra o banco: usuario + documento + data_impressao + paginas
-- [x] Deteccao interna no CSV (duplicatas no proprio arquivo)
-- [x] Indice unico no banco (usuario, data_impressao, paginas)
-- [x] Importacao pula duplicatas, registra contagem separada
-- [x] 47 testes passando no total
+- [x] Deteccao de duplicatas contra banco de dados
+- [x] Deteccao de duplicatas internas no proprio CSV
+- [x] Indice unico composto no banco (usuario, data_impressao, paginas)
 
 ---
 
 ## SPRINT 3 - Dashboard e KPIs
 **Objetivo**: Interface principal com filtros e cards de KPI.
-**Status**: CONCLUIDA
+**Status**: CONCLUIDA em 2026-02-18
 
 ### 3.1 - Cards de KPI
-- [x] Total de impressoes + paginas
-- [x] Custo total (R$)
-- [x] Custo pessoal (R$) — destaque em amber
-- [x] Custo administrativo (R$)
-- [x] Percentual pessoal/total
-- [x] Calculo reativo via SQL aggregate no Livewire Dashboard
+**Prioridade**: CRITICA
 
-### 3.2 - Filtros
-- [x] Date Range (data_inicio, data_fim) com inputs
-- [x] Presets: "Este Mes", "Ultimos 30 dias", "Este Ano", "Tudo"
-- [x] Filtro por usuario (campo de busca)
+- [x] Livewire Component: Dashboard (Dashboard.php)
+- [x] 5 KPI cards: total impressoes, custo total, custo pessoal, custo admin, percentual
+- [x] Calculo reativo ao filtro de datas
+
+### 3.2 - Filtros (Date Range + Outros)
+**Prioridade**: CRITICA
+
+- [x] Date Range Picker (campos inicio-fim)
+- [x] Presets: "Ultimos 30 dias", "Este Mes", "Ano Atual", "Tudo"
+- [x] Dropdown de usuario (select)
 - [x] Toggle: Todos / Apenas Pessoais / Apenas Administrativos
-- [x] Campo de busca por nome do documento
-- [x] Recalculo reativo ao alterar qualquer filtro (wire:model.live)
+- [x] Campo de busca global por nome do documento
+- [x] Recalculo instantaneo ao alterar qualquer filtro
 
 ### 3.3 - Tabela Principal
-- [x] Colunas: Data | Usuario | Documento | Paginas | Custo | Classificacao | Origem
-- [x] Paginacao (15 por pagina) com WithPagination
+**Prioridade**: CRITICA
+
+- [x] Colunas: Data | Usuario | Documento | Paginas | Custo | Classificacao | Acoes
+- [x] Paginacao (15 por pagina)
 - [x] Destaque visual: PESSOAL = amber, ADMINISTRATIVO = violet
-- [x] Badge clicavel para override manual (alternarClassificacao)
-- [x] Indicador visual: classificacao AUTO vs MANUAL
+- [x] Badge clicavel para override manual
+- [x] Indicadores AUTO / MANUAL por registro
 
 ---
 
 ## SPRINT 4 - Override Manual e Persistencia
 **Objetivo**: Usuarios podem alterar classificacoes; historico auditado.
-**Status**: CONCLUIDA (integrado no Sprint 3)
+**Status**: CONCLUIDA em 2026-02-18 (integrado no Sprint 3)
 
 ### 4.1 - Override Manual
-- [x] Livewire Action: alternarClassificacao(printLogId)
-- [x] Persiste em manual_overrides com classificacao_anterior e classificacao_nova
-- [x] Feedback visual imediato via Livewire (sem reload de pagina)
-- [x] Indicador: badge "MANUAL" vs "AUTO" na coluna classificacao_origem
+**Prioridade**: ALTA
 
-> Nota: Undo/reverter nao implementado (backlog futuro)
+- [x] Livewire Action: alternarClassificacao(printLogId)
+- [x] Persistir em manual_overrides com classificacao_anterior e classificacao_nova
+- [x] Feedback visual imediato (sem reload)
+- [x] Indicador visual: classificacao manual vs automatica
+- [ ] Undo: possibilidade de reverter para classificacao original (backlog)
 
 ---
 
 ## SPRINT 5 - Exportacao (Excel + PDF)
 **Objetivo**: Geracao de relatorios para contabilidade e gestao.
-**Status**: CONCLUIDA
+**Status**: CONCLUIDA em 2026-02-18/19
 
 ### 5.1 - Exportacao Excel (.xlsx)
-- [x] PrintLogsExport com WithMultipleSheets
-- [x] Aba 1 (Resumo): Por usuario — total paginas, custo total, custo pessoal, custo admin
-- [x] Aba 2 (Detalhado): Todas as impressoes filtradas com classificacao final
-- [x] Botao "Exportar Excel" no dashboard com filtros ativos
-- [x] Respeita filtros: data_inicio, data_fim, usuario, tipo, documento
-- [x] Correcao: parametros null via ConvertEmptyStringsToNull tratados com ??
+**Prioridade**: ALTA
+
+- [x] Instalar maatwebsite/excel
+- [x] PrintLogsExport com 2 abas: Resumo (por usuario) + Detalhado (todas impressoes)
+- [x] ResumoExport class
+- [x] DetalhadoExport class
+- [x] Botao "Exportar Excel" no dashboard
+- [x] Respeitar filtros ativos na exportacao
 
 ### 5.2 - Exportacao PDF (Relatorio Executivo)
-- [x] Template reports/executive.blade.php (CSS inline, compativel DomPDF)
-- [x] Sumario Executivo: 4 KPI cards (total, custo total, pessoal, admin)
-- [x] Top 5 ofensores: tabela usuario x custo pessoal x percentual
+**Prioridade**: ALTA
+
+- [x] Instalar barryvdh/laravel-dompdf
+- [x] Blade template: reports/executive.blade.php
+- [x] ExportController com metodos excel(), pdf(), modeloCsv()
+- [x] KPI grid + Top 5 ofensores no PDF
 - [x] Botao "Exportar PDF" no dashboard
-- [x] Correcao PHP 8.4: tempnam() warning suprimido via AppServiceProvider
-- [x] Correcao: tipo de retorno pdf() corrigido para Illuminate\Http\Response
+- [x] Respeitar filtros ativos
 
 ---
 
 ## SPRINT 6 - Design System e Polimento
 **Objetivo**: Aplicar design "Minimalismo Corporativo" em toda a interface.
-**Status**: CONCLUIDA (integrado desde o inicio)
+**Status**: CONCLUIDA em 2026-02-18 (integrado desde o inicio)
 
 ### 6.1 - Design System
-- [x] Cores customizadas via @theme no Tailwind CSS 4 (sem tailwind.config.js)
-  - Primary Navy Blue: #1E3A8A
-  - Pessoal Amber: #F59E0B
-  - Administrativo Violet: #8B5CF6
-  - Background Off-White: #F8FAFC
-- [x] Tipografia: Inter (corpo) + JetBrains Mono (numeros financeiros) via Google Fonts
-- [x] Layout base: sidebar navy + header branco + main content
-- [x] Cards com rounded-xl, shadow-sm, border
-- [x] Tabela clean com hover, cabecalho bg-slate-50
-- [x] Loading states (wire:loading) na importacao e dashboard
-- [x] Favicon: titulo "Catalogador de Impressoes GAP"
+**Prioridade**: MEDIA
+
+- [x] Paleta via @theme no Tailwind CSS 4
+  - Primary (Navy Blue): #1E3A8A
+  - Pessoal: #F59E0B (amber)
+  - Administrativo: #8B5CF6 (violet)
+  - Background (Off-White): #F8FAFC
+- [x] Tipografia: Inter + JetBrains Mono via Google Fonts
+- [x] Layout base (sidebar navy + header) responsivo
+- [x] Cards com rounded-xl, shadow-sm
+- [x] Tabela clean com hover e cabecalho bg-slate-50
+- [x] Loading states (wire:loading) e empty states
+- [x] Favicon e titulo correto
 
 ---
 
-## BUGS CORRIGIDOS (pos-sprints)
+## SPRINT 7 - Edicao de Classificacao Manual (Modal)
+**Objetivo**: Substituir toggle cego por modal de confirmacao explicito.
+**Status**: CONCLUIDA em 2026-02-19
+**Commit**: `feat(sprint-7): modal de edicao de classificacao com indicador MANUAL inteligente`
 
-| Data | Bug | Correcao |
-|------|-----|----------|
-| 2026-02-19 | Alpine duplicado — Livewire 4 ja gerencia Alpine | Removido import manual do app.js e alpinejs do package.json |
-| 2026-02-19 | DomPDF tempnam() PHP 8.4 warning vira excecao | set_error_handler no AppServiceProvider suprime E_WARNING de tempnam() |
-| 2026-02-19 | pdf() retornava StreamedResponse mas DomPDF retorna Response | Tipo de retorno corrigido para Illuminate\Http\Response |
-| 2026-02-19 | ExportController parametros null (ConvertEmptyStringsToNull) | Substituido $request->get('k', 'd') por $request->get('k') ?? 'd' |
-| 2026-02-19 | modelo-impressoes.csv em storage/ (no .gitignore) | Movido para resources/templates/, ExportController usa resource_path() |
-| 2026-02-19 | Botao download modelo interceptado pelo Livewire | Adicionado atributo download no elemento <a> |
+### 7.1 - Modal de Confirmacao
+**Prioridade**: ALTA
+
+- [x] Livewire: `abrirModalEdicao(int $id)` — substitui alternarClassificacao()
+- [x] Livewire: `salvarClassificacao(string $novaClassificacao)` — persiste se diferente
+- [x] Livewire: `fecharModal()` — reseta propriedades do modal
+- [x] Propriedades: `$modalAberto`, `$modalPrintLogId`, `$modalDocumento`, `$modalUsuario`, `$modalClassificacaoAtual`
+- [x] Modal controlado por `$modalAberto` (wire:if) com backdrop blur
+- [x] Dois botoes: [PESSOAL] amber | [ADMINISTRATIVO] violet
+- [x] Registro em manual_overrides apenas quando classificacao muda
+- [x] Indicador MANUAL inteligente: exibe apenas quando classificacao difere da automatica
+- [x] 4 testes novos (TDD) + 47 anteriores continuam passando
 
 ---
 
-## RESUMO DE STATUS
+## RESUMO DE PRIORIDADES
 
 | Sprint | Modulo | Prioridade | Status |
 |--------|--------|------------|--------|
 | 1 | Setup Docker + Laravel | CRITICA | CONCLUIDA |
 | 1 | Modelagem do Banco | CRITICA | CONCLUIDA |
 | 1 | ClassifierService (TDD) | CRITICA | CONCLUIDA |
-| 2 | Importacao CSV com preview | CRITICA | CONCLUIDA |
-| 2 | Deteccao de Duplicatas (TDD) | CRITICA | CONCLUIDA |
-| 2 | Arquivo Modelo CSV para download | ALTA | CONCLUIDA |
+| 2 | Importacao CSV + Duplicatas | CRITICA | CONCLUIDA |
 | 3 | Dashboard + KPIs | CRITICA | CONCLUIDA |
 | 3 | Filtros e Tabela | CRITICA | CONCLUIDA |
 | 4 | Override Manual | ALTA | CONCLUIDA |
 | 5 | Exportacao Excel | ALTA | CONCLUIDA |
 | 5 | Exportacao PDF | ALTA | CONCLUIDA |
 | 6 | Design System | MEDIA | CONCLUIDA |
+| 7 | Modal de Edicao de Classificacao | ALTA | CONCLUIDA |
 
 ---
 
----
+## BACKLOG (Proximas Sprints)
 
-## SPRINT 7 - Edicao de Classificacao Manual
-**Objetivo**: Substituir toggle binario por modal de confirmacao com escolha explicita.
-**Status**: EM EXECUCAO
-
-### 7.1 - Modal de Edicao
-- [ ] Testes: abre_modal, salva_nova_classificacao, nao_cria_override_sem_mudanca, cancela_modal
-- [ ] Dashboard.php: propriedades do modal + abrirModalEdicao() + salvarClassificacao() + fecharModal()
-- [ ] View: modal wire:if com overlay, badge colorido, botoes [PESSOAL] [ADMINISTRATIVO] [Cancelar]
-- [ ] Badge da tabela agora abre modal (nao altera direto)
-- [ ] Indicador visual: badge "MANUAL" visivel apenas quando classificacao difere da original (AUTO)
+| # | Ideia | Prioridade | Complexidade |
+|---|-------|------------|--------------| 
+| 1 | Queue/Job para CSVs grandes (>1000 linhas) com barra de progresso | ALTA | Media |
+| 2 | Autocomplete de usuario nos filtros do dashboard | MEDIA | Baixa |
+| 3 | Ordenacao por coluna na tabela do dashboard | MEDIA | Baixa |
+| 4 | Autenticacao de usuarios (login/logout/perfis) | ALTA | Alta |
+| 5 | Undo: reverter classificacao manual para original | MEDIA | Baixa |
 
 ---
 
-## BACKLOG FUTURO (nao implementado)
+## DEFINITION OF DONE (por sprint)
 
-- [ ] Queue/Job para arquivos CSV grandes (>1000 linhas) com progresso
-- [ ] Autocomplete de usuario nos filtros do dashboard
-- [ ] Ordenacao por coluna na tabela do dashboard
-- [ ] Autenticacao de usuarios (login/logout)
+- [x] Todos os testes passando
+- [x] Sem erros no `php artisan test`
+- [x] Commit atomico em portugues sem emojis
+- [x] Feature marcada como concluida neste ROADMAP
 
 ---
 
-## METRICAS DO PROJETO
+## BUGS CORRIGIDOS POS-SPRINTS
+
+> Registro critico de bugs encontrados e corrigidos apos a entrega inicial das sprints.
+> Esta tabela e FONTE DE VERDADE para evitar retrabalho e consulta rapida em bugs futuros.
+
+| Data | Issue | Sintoma | Solucao | Commit |
+|------|-------|---------|---------|--------|
+| 2026-02-19 | Alpine.js duplicado no bundle | Erros de "already initialized" no console | Remover import manual do app.js — Livewire 4 ja gerencia o Alpine internamente | fix(frontend) |
+| 2026-02-19 | DomPDF tempnam() PHP 8.4 | Warning fatal ao gerar PDF, rota /relatorio retorna 500 | `set_error_handler` no AppServiceProvider suprimindo E_WARNING antes do boot do DomPDF | fix(dompdf) |
+| 2026-02-19 | pdf() tipo de retorno errado | PHPStan / runtime error no retorno do controller | Tipo de retorno corrigido para `Illuminate\Http\Response` no ExportController | fix(dompdf) |
+| 2026-02-19 | Excel 500 com parametros null | Exportacao quebra quando filtros de URL estao vazios | Middleware `ConvertEmptyStringsToNull` converte strings vazias; substituir `get(k,d)` por `get(k) ?? d` | fix(export) |
+| 2026-02-19 | modelo CSV no .gitignore | Arquivo de modelo nao disponivel para download | Movido de `storage/app/` (ignorado) para `resources/templates/` (rastreado) | feat(sprint-2-3) |
+| 2026-02-19 | Download modelo interceptado pelo Livewire | Click no link nao iniciava download — Livewire capturava o evento | Adicionar atributo `download` no elemento `<a>` para sinalizar ao browser que e download direto | fix(import) |
+| 2026-02-19 | /importar retorna 500 em producao | Rota de importacao quebra mesmo com DomPDF corrigido | Suprimir E_WARNING do tempnam() no boot do AppServiceProvider (solucao definitiva) | fix(dompdf) |
+
+### Licoes criticas para proximas sprints
+- **Livewire 4 + Alpine.js**: NUNCA importar Alpine manualmente no app.js. O Livewire 4 injeta e gerencia o Alpine.
+- **DomPDF + PHP 8.4**: Sempre suprimir E_WARNING do tempnam() no AppServiceProvider ao usar dompdf.
+- **ExportController com filtros**: Sempre usar `?? operador` ao receber parametros da query string — o middleware `ConvertEmptyStringsToNull` converte strings vazias para null antes da request chegar ao controller.
+- **Downloads via Livewire**: Links de download devem ter atributo `download` para evitar interceptacao pelo router do Livewire.
+- **resources/templates vs storage**: Arquivos de template para usuario final devem ficar em `resources/` (rastreado pelo git), nao em `storage/` (frequentemente no .gitignore).
+
+---
+
+## METRICAS FINAIS (Sprint 7)
 
 | Metrica | Valor |
 |---------|-------|
-| Testes unitarios/feature | 47 passando |
-| PHP | 8.4.18 |
-| Laravel | 12.52.0 |
-| Livewire | 4.1.4 |
-| Tailwind CSS | 4.x |
-| Commits em portugues | Sim |
-| TDD aplicado | ClassifierService, CsvParserService, DuplicataService |
+| Testes passando | 51 (47 + 4 novos na Sprint 7) |
+| Sprints entregues | 7/7 (100%) |
+| Bugs corrigidos | 7 |
+| Stack | Laravel 12.52 + Livewire 4.1.4 + Tailwind CSS 4 + PHP 8.4 |
+| Cobertura TDD | ClassifierService + CsvParserService + DuplicataService + Dashboard |
 
 ---
 
-## DEFINITION OF DONE (aplicado)
-
-- [x] Todos os testes passando (47 testes)
-- [x] Sem erros no `php artisan test`
-- [x] Sem warnings criticos no console do browser
-- [x] Commits atomicos em portugues sem emojis
-- [x] Features marcadas como concluidas neste ROADMAP
-
----
-
-**Versao**: 3.1
-**Status**: Sprint 7 em execucao
+**Versao**: 3.0
+**Status**: Ativo
 **Atualizado**: 2026-02-19
