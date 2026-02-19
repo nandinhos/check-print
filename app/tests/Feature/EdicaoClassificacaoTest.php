@@ -203,6 +203,80 @@ class EdicaoClassificacaoTest extends TestCase
     }
 
     // -----------------------------------------------------------------------
+    // Dashboard: reverterClassificacao desfaz override manual
+    // -----------------------------------------------------------------------
+
+    public function test_reverter_classificacao_volta_para_classificacao_auto(): void
+    {
+        $log = PrintLog::factory()->create([
+            'classificacao'        => 'ADMINISTRATIVO',
+            'classificacao_auto'   => 'PESSOAL',
+            'classificacao_origem' => 'MANUAL',
+        ]);
+
+        Livewire::test(Dashboard::class)
+            ->call('reverterClassificacao', $log->id);
+
+        $this->assertDatabaseHas('print_logs', [
+            'id'                   => $log->id,
+            'classificacao'        => 'PESSOAL',
+            'classificacao_origem' => 'AUTO',
+        ]);
+    }
+
+    public function test_reverter_cria_registro_em_manual_overrides(): void
+    {
+        $log = PrintLog::factory()->create([
+            'classificacao'        => 'ADMINISTRATIVO',
+            'classificacao_auto'   => 'PESSOAL',
+            'classificacao_origem' => 'MANUAL',
+        ]);
+
+        Livewire::test(Dashboard::class)
+            ->call('reverterClassificacao', $log->id);
+
+        $this->assertDatabaseHas('manual_overrides', [
+            'print_log_id'           => $log->id,
+            'classificacao_anterior' => 'ADMINISTRATIVO',
+            'classificacao_nova'     => 'PESSOAL',
+        ]);
+    }
+
+    public function test_reverter_nao_faz_nada_se_ja_for_classificacao_auto(): void
+    {
+        $log = PrintLog::factory()->create([
+            'classificacao'        => 'PESSOAL',
+            'classificacao_auto'   => 'PESSOAL',
+            'classificacao_origem' => 'AUTO',
+        ]);
+
+        Livewire::test(Dashboard::class)
+            ->call('reverterClassificacao', $log->id);
+
+        $this->assertDatabaseMissing('manual_overrides', ['print_log_id' => $log->id]);
+        $this->assertDatabaseHas('print_logs', [
+            'id'                   => $log->id,
+            'classificacao'        => 'PESSOAL',
+            'classificacao_origem' => 'AUTO',
+        ]);
+    }
+
+    public function test_reverter_faz_is_manual_retornar_false(): void
+    {
+        $log = PrintLog::factory()->create([
+            'classificacao'        => 'ADMINISTRATIVO',
+            'classificacao_auto'   => 'PESSOAL',
+            'classificacao_origem' => 'MANUAL',
+        ]);
+
+        Livewire::test(Dashboard::class)
+            ->call('reverterClassificacao', $log->id);
+
+        $log->refresh();
+        $this->assertFalse($log->isManual());
+    }
+
+    // -----------------------------------------------------------------------
     // Importacao: classificacao_auto e gravada junto com classificacao na importacao
     // -----------------------------------------------------------------------
 
