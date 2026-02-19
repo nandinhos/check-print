@@ -1,157 +1,221 @@
-Product Requirements Document (PRD)
+# Product Requirements Document (PRD)
+# Catalogador de Impressoes GAP
 
-Catalogador de Impressões GAP
+| Campo | Valor |
+|-------|-------|
+| Versao | 1.1 |
+| Data | 18/02/2026 |
+| Status | Aprovado |
+| Autor | Product Team |
+| Stack | Laravel 12 + TALL Stack + Docker + MySQL 8.0 |
 
-| Versão | Data | Status | Autor |
-| 1.0 | 18/02/2026 | Draft | Product Team |
+---
 
-1. Visão Geral do Produto
+## 1. Visao Geral do Produto
 
-O Catalogador de Impressões GAP é uma aplicação web focada na auditoria e gestão de custos de impressão corporativa. O sistema processa logs de impressão (originários de sistemas como NDDPrint), classifica automaticamente os documentos entre "Administrativo" e "Pessoal" baseando-se em heurísticas de nomenclatura, e gera relatórios gerenciais para tomada de decisão e ressarcimento de custos.
+O **Catalogador de Impressoes GAP** e uma aplicacao web focada na auditoria e gestao de custos de impressao corporativa. O sistema processa logs de impressao (originarios de sistemas como NDDPrint), classifica automaticamente os documentos entre "Administrativo" e "Pessoal" baseando-se em heuristicas de nomenclatura, e gera relatorios gerenciais para tomada de decisao e ressarcimento de custos.
 
-1.1 Objetivos Principais
+### 1.1 Objetivos Principais
 
-Automatizar a Classificação: Reduzir o tempo manual de análise de relatórios de impressão.
+| Objetivo | Descricao |
+|----------|-----------|
+| Automatizar a Classificacao | Reduzir o tempo manual de analise de relatorios de impressao |
+| Auditoria de Custos | Identificar gastos com impressoes pessoais nao autorizadas |
+| Visualizacao Clara | Oferecer dashboards intuitivos para gestores |
+| Portabilidade | Importacao de dados brutos (CSV) e exportacao de relatorios (PDF/Excel) |
 
-Auditoria de Custos: Identificar gastos com impressões pessoais não autorizadas.
+---
 
-Visualização Clara: Oferecer dashboards intuitivos para gestores.
+## 2. Design System & UX
 
-Portabilidade: Permitir importação de dados brutos (CSV) e exportação de relatórios finais (PDF/Excel).
+**Filosofia**: "Minimalismo Corporativo". O design deve transmitir seriedade, limpeza e eficiencia. Usar cores apenas para indicar status ou acoes criticas.
 
-2. Design System & UX
+### 2.1 Paleta de Cores
 
-Filosofia: "Minimalismo Corporativo". O design deve transmitir seriedade, limpeza e eficiência. Evitar excesso de cores; usar cores apenas para indicar status ou ações críticas.
+| Token | Hex | Uso |
+|-------|-----|-----|
+| Primary (Navy Blue) | `#1E3A8A` | Cabecalhos, botoes primarios, branding |
+| Secondary (Slate) | `#64748B` | Textos secundarios, bordas sutis, icones inativos |
+| Background (Off-White) | `#F8FAFC` | Fundo da aplicacao (evitar #FFFFFF em grandes areas) |
+| Administrativo | `#8B5CF6` (Violeta) ou `#10B981` (Esmeralda) | Badge de status |
+| Pessoal (Warning) | `#F59E0B` (Ambar) | Destaque para atencao, sem ser alarmista |
+| Erro / Acao Destrutiva | `#EF4444` (Vermelho) | Confirmacoes destrutivas |
 
-2.1 Paleta de Cores
+### 2.2 Tipografia
 
-Primary (Navy Blue): #1E3A8A - Cabeçalhos, botões primários, branding.
+| Uso | Familia | Peso |
+|-----|---------|------|
+| Corpo de texto | Inter ou Roboto | Regular (400) |
+| Labels e cabecalhos de tabela | Inter ou Roboto | Medium (500) |
+| Titulos principais e valores financeiros | Inter ou Roboto | Bold (700) |
+| Dados numericos em tabelas | JetBrains Mono ou Roboto Mono | Regular (400) |
 
-Secondary (Slate): #64748B - Textos secundários, bordas sutis, ícones inativos.
+> Fontes monoespaco garantem alinhamento decimal perfeito em tabelas financeiras.
 
-Background (Off-White): #F8FAFC - Fundo da aplicação para evitar fadiga ocular (evitar branco absoluto #FFFFFF em grandes áreas).
+### 2.3 Componentes de UI
 
-Semantic Colors:
+**Cards**
+- Bordas arredondadas: `rounded-xl`
+- Sombra suave: `shadow-sm`
+- Fundo branco
 
-Administrativo (Success/Neutral): #8B5CF6 (Violeta suave) ou #10B981 (Esmeralda).
+**Botoes**
+- Exportar: Outline ou Ghost button com icone
+- Acao Principal: Solid fill com `rounded-lg`
 
-Pessoal (Warning): #F59E0B (Âmbar) - Destaque para atenção, mas sem ser alarmista como vermelho.
+**Tabelas**
+- Linhas divisorias sutis
+- Cabecalho com fundo `bg-slate-50`
+- Efeito hover nas linhas
 
-Erro/Ação Destrutiva: #EF4444 (Vermelho).
+---
 
-2.2 Tipografia
+## 3. Especificacoes Funcionais
 
-Família Principal: Inter ou Roboto (Sans-serif).
+### 3.1 Modulo de Importacao (CSV)
 
-Pesos:
+O sistema aceita arquivos estruturados no formato CSV (separador `;` ou `,`).
 
-Regular (400): Corpo de texto.
+**Input**: Botao de upload com suporte a drag-and-drop "Arraste ou Clique para enviar CSV".
 
-Medium (500): Labels e cabeçalhos de tabela.
+**Validacao**: O sistema verifica se o cabecalho contem as colunas minimas:
+- `Data`, `Hora`, `Usuario`, `Documento`, `Paginas`, `Custo`
 
-Bold (700): Números financeiros e Títulos principais.
+**Feedback**:
+- Barra de progresso durante o processamento de grandes arquivos
+- Mensagem de sucesso: "X registros importados"
+- Mensagem de erro com identificacao da linha problematica
 
-Dados Numéricos: JetBrains Mono ou Roboto Mono para tabelas financeiras (alinhamento decimal perfeito).
+### 3.2 Seletor de Datas (Date Range Picker)
 
-2.3 Componentes de UI
+**Funcionalidade**: Filtrar o dataset importado por periodo.
 
-Cards: Bordas arredondadas (rounded-xl), sombra suave (shadow-sm), fundo branco.
+**Componente**: Calendario duplo (Inicio - Fim).
 
-Botões:
+**Comportamento**: Ao alterar a data, todos os cards de KPI e a tabela sao recalculados instantaneamente.
 
-Exportar: Outline ou Ghost button com ícone.
+**Presets rapidos**:
+- "Ultimos 30 dias"
+- "Este Mes"
+- "Ano Atual"
 
-Ação Principal: Solid fill com cantos levemente arredondados (rounded-lg).
+### 3.3 Motor de Classificacao (Core)
 
-Tabelas: Design "Clean". Linhas divisórias sutis, cabeçalho com fundo cinza muito claro (bg-slate-50), efeito hover nas linhas.
+**Logica**: Algoritmo de palavras-chave (keywords) aplicado ao nome do documento.
 
-3. Especificações Funcionais
+| Categoria | Exemplos de Keywords |
+|-----------|---------------------|
+| PESSOAL | boleto, nubank, fatura, banco, cpf, cnh, passaporte, netflix, spotify, curriculo, atestado, receita, exame |
+| ADMINISTRATIVO (default) | ficha, relatorio, oficio, memorando, portaria, escala, boletim, ata, ordem |
 
-3.1 Módulo de Importação (CSV)
+**Regras**:
+- Match case-insensitive no nome do documento
+- Sem match = ADMINISTRATIVO (default seguro)
 
-O sistema deve abandonar o processamento de texto cru e aceitar arquivos estruturados.
+**Override Manual**: O usuario pode clicar na classificacao na tabela e alternar manualmente entre PESSOAL/ADMINISTRATIVO. Essa alteracao e persistida no banco de dados com registro de auditoria.
 
-Input: Botão de upload "Arraste ou Clique para enviar CSV".
+### 3.4 Filtros Avancados
 
-Validação: O sistema deve verificar se o cabeçalho do CSV contém as colunas mínimas: Usuário, Nome do Documento, Data, Páginas, Custo.
+| Filtro | Tipo | Descricao |
+|--------|------|-----------|
+| Por Usuario | Dropdown com busca | Autocomplete para selecionar um militar/funcionario especifico |
+| Por Tipo | Toggle | "Todos" / "Apenas Pessoais" / "Apenas Administrativos" |
+| Busca Global | Campo de texto | Filtra por nome do documento |
 
-Feedback: Barra de progresso durante o processamento de grandes arquivos e mensagem de sucesso/erro.
+---
 
-3.2 Seletor de Datas (Date Range Picker)
+## 4. Modulo de Exportacao (Reporting)
 
-Funcionalidade: Permitir filtrar o dataset importado por período.
+### 4.1 Exportacao para Excel (.xlsx)
 
-Componente: Calendário duplo (Início - Fim).
+Gera arquivo estruturado para contabilidade.
 
-Comportamento: Ao alterar a data, todos os cards de KPI e a tabela devem ser recalculados instantaneamente.
+**Aba 1 - Resumo**:
+- Totais por usuario: total paginas, total custo, custo pessoal, custo administrativo
+- Linha de totais gerais
 
-Presets: Botões rápidos para "Últimos 30 dias", "Este Mês", "Ano Atual".
+**Aba 2 - Detalhado**:
+- Lista completa de todas as impressoes filtradas na tela atual
+- Classificacao final (incluindo overrides manuais do operador)
 
-3.3 Motor de Classificação (Core)
+### 4.2 Exportacao para PDF (Relatorio Executivo)
 
-Lógica: Manter o algoritmo de palavras-chave (keywords) definido no protótipo.
+PDF com qualidade de impressao, pronto para anexar a oficios ou memorandos.
 
-Override Manual: O usuário deve poder clicar na classificação na tabela e alternar manualmente entre PESSOAL/ADMINISTRATIVO. Essa alteração deve persistir na sessão atual.
+**Estrutura**:
+- **Cabecalho**: Logotipo da organizacao + Titulo "Relatorio de Auditoria de Impressao" + Periodo analisado
+- **Sumario Executivo**: Cards com Custo Total e Custo "Pessoal" identificado
+- **Top 5 Ofensores**: Tabela resumida dos 5 usuarios com maior custo em impressoes pessoais
+- **Layout**: Limpo, minimalista, A4 vertical, fundo branco, fontes escuras
 
-3.4 Filtros Avançados
+---
 
-Por Usuário: Dropdown com busca (autocomplete) para selecionar um militar/funcionário específico.
+## 5. Requisitos Nao-Funcionais
 
-Por Tipo: Checkbox ou Toggle para ver "Apenas Pessoais", "Apenas Administrativos" ou "Todos".
+| Requisito | Detalhes |
+|-----------|----------|
+| Performance | Processamento de CSV com ate 10.000 linhas sem degradacao (uso de Jobs/Queue no Laravel) |
+| Arquitetura | Server-side com Laravel 12. Dados persistidos em MySQL 8.0 |
+| Compatibilidade | Chrome, Edge e Firefox (Desktop). Mobile nao e prioridade |
+| Auditoria | Todas as alteracoes manuais de classificacao sao logadas com usuario e timestamp |
+| Isolamento | Ambiente em Docker (PHP 8.4 + MySQL 8.0 + Nginx) |
 
-Busca Global: Campo de texto que filtra por nome do documento.
+---
 
-4. Módulo de Exportação (Reporting)
+## 6. Estrutura de Dados (Modelo CSV Esperado)
 
-4.1 Exportação para Excel (.xlsx)
+Separador aceito: `;` ou `,`
 
-Deve gerar um arquivo estruturado para contabilidade.
-
-Aba 1 (Resumo): Totais por usuário, total gasto, total pessoal vs administrativo.
-
-Aba 2 (Detalhado): Lista completa de todas as impressões filtradas na tela atual, com suas respectivas classificações (incluindo as alterações manuais feitas pelo operador).
-
-4.2 Exportação para PDF (Relatório Executivo)
-
-O PDF deve ser gerado com qualidade de impressão, pronto para ser anexado a ofícios ou memorandos.
-
-Cabeçalho: Logotipo da organização, Título "Relatório de Auditoria de Impressão", Período analisado.
-
-Sumário Executivo: Cards visuais com Custo Total e Custo "Pessoal" identificado.
-
-Top Ofensores: Tabela resumida dos 5 usuários com maior custo em impressões pessoais.
-
-Layout: Limpo, minimalista, fundo branco, fontes escuras.
-
-5. Requisitos Não-Funcionais
-
-Performance: O processamento de um CSV com até 10.000 linhas não deve travar o navegador (uso de Web Workers se necessário).
-
-Privacidade: Todo o processamento deve ser Client-Side (no navegador). Nenhum dado de impressão deve ser enviado para servidores externos.
-
-Compatibilidade: Funcionar perfeitamente em Chrome, Edge e Firefox (Desktop). Mobile não é prioridade (ferramenta administrativa).
-
-6. Estrutura de Dados (Modelo CSV Esperado)
-
-Para garantir a importação, o CSV deve seguir o padrão (separador ; ou ,):
-
+```
 Data;Hora;Usuario;Documento;Paginas;Custo;Aplicativo
 27/02/2025;13:32:24;1S Brasil;Ficha S1 Caetano;1;0.02;PDF
 04/08/2025;14:15:00;Ten Franco;Boleto Nubank;1;0.02;Chrome
-...
+```
 
+### Modelo de Banco de Dados
 
+**print_logs**
 
-7. Critérios de Aceite (Definition of Done)
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | bigint PK | |
+| usuario | string | Nome do militar/funcionario |
+| documento | string | Nome do documento impresso |
+| data_impressao | datetime | Data e hora da impressao |
+| paginas | integer | Numero de paginas |
+| custo | decimal(8,2) | Custo em reais |
+| aplicativo | string | Aplicativo de origem (PDF, Chrome, etc) |
+| classificacao | enum(PESSOAL, ADMINISTRATIVO) | Resultado da classificacao |
+| classificacao_origem | enum(AUTO, MANUAL) | Origem da classificacao |
+| created_at | timestamp | |
 
-* Usuário consegue carregar um CSV.
+**manual_overrides**
 
-* Dashboard exibe números corretos baseados no CSV.
+| Coluna | Tipo | Descricao |
+|--------|------|-----------|
+| id | bigint PK | |
+| print_log_id | bigint FK | Referencia ao registro de impressao |
+| classificacao_anterior | enum | Valor antes da alteracao |
+| classificacao_nova | enum | Valor depois da alteracao |
+| alterado_por | string | Identificacao do operador |
+| created_at | timestamp | |
 
-* Classificação automática identifica "Boleto" como Pessoal.
+---
 
-* Usuário consegue alterar classificação manualmente.
+## 7. Criterios de Aceite (Definition of Done)
 
-* Exportação PDF gera arquivo legível e bem formatado.
+- [ ] Usuario consegue carregar um CSV via upload
+- [ ] Dashboard exibe numeros corretos baseados no CSV importado
+- [ ] Classificacao automatica identifica "Boleto" como PESSOAL
+- [ ] Classificacao automatica identifica "Ficha S1" como ADMINISTRATIVO
+- [ ] Usuario consegue alterar classificacao manualmente
+- [ ] Alteracao manual e persistida e auditada
+- [ ] Filtro de datas recalcula KPIs instantaneamente
+- [ ] Exportacao Excel gera duas abas estruturadas
+- [ ] Exportacao PDF gera relatorio executivo com top 5 ofensores
+- [ ] `docker-compose up` sobe o ambiente completo sem erros
 
-* Exportação Excel contém dados brutos editáveis.
+---
+
+*PRD v1.1 - Atualizado em 18/02/2026*
+*Decisao de arquitetura: Laravel 12 + MySQL + Docker (server-side)*

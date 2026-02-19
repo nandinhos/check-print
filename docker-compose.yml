@@ -1,0 +1,72 @@
+services:
+  # Aplicacao Laravel (PHP 8.4-FPM)
+  app:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    image: check-print-app
+    container_name: check_print_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./app:/var/www
+    networks:
+      - check-print-network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Servidor Web (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: check_print_nginx
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    volumes:
+      - ./app:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - check-print-network
+    depends_on:
+      - app
+
+  # Banco de Dados (MySQL 8.0)
+  db:
+    image: mysql:8.0
+    container_name: check_print_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: check_print
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: check_print_user
+      MYSQL_PASSWORD: check_print_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - check-print-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Redis (filas para processamento de CSV grande)
+  redis:
+    image: redis:alpine
+    container_name: check_print_redis
+    restart: unless-stopped
+    ports:
+      - "6382:6379"
+    networks:
+      - check-print-network
+
+networks:
+  check-print-network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

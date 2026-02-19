@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../vendor/livewire/livewire/src/**/*.php';
+
+@theme {
+    /* Tipografia */
+    --font-sans: 'Inter', 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace;
+
+    /* Design System - Minimalismo Corporativo GAP */
+
+    /* Primary - Navy Blue */
+    --color-primary-50: #eff6ff;
+    --color-primary-100: #dbeafe;
+    --color-primary-200: #bfdbfe;
+    --color-primary-300: #93c5fd;
+    --color-primary-400: #60a5fa;
+    --color-primary-500: #3b82f6;
+    --color-primary-600: #2563eb;
+    --color-primary-700: #1d4ed8;
+    --color-primary-800: #1e40af;
+    --color-primary-900: #1e3a8a;
+    --color-primary-950: #172554;
+
+    /* Background */
+    --color-app-bg: #f8fafc;
+
+    /* Semantic - Administrativo (Violeta) */
+    --color-admin: #8b5cf6;
+    --color-admin-bg: #f5f3ff;
+    --color-admin-border: #c4b5fd;
+
+    /* Semantic - Pessoal (Ambar) */
+    --color-personal: #f59e0b;
+    --color-personal-bg: #fffbeb;
+    --color-personal-border: #fcd34d;
+
+    /* Semantic - Erro */
+    --color-danger: #ef4444;
+    --color-danger-bg: #fef2f2;
+    --color-danger-border: #fca5a5;
+}
