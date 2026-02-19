@@ -1,5 +1,2 @@
 import './bootstrap';
-import Alpine from 'alpinejs';
-
-window.Alpine = Alpine;
-Alpine.start();
+// Alpine e gerenciado internamente pelo Livewire 4 — nao iniciar manualmente.
