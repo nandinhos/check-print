@@ -7,8 +7,8 @@ use App\Models\PrintLog;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportController extends Controller
 {
@@ -28,7 +28,7 @@ class ExportController extends Controller
         );
     }
 
-    public function pdf(Request $request): StreamedResponse
+    public function pdf(Request $request): Response
     {
         $dataInicio    = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
         $dataFim       = $request->get('data_fim', now()->format('Y-m-d'));
