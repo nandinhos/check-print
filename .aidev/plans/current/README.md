@@ -1,41 +1,45 @@
-# Current - Em Execucao
+# 🏃 Current - Em Execução
 
 > Sprint ativa sendo executada no momento
-> Atualizado: 2026-02-19
 
 ---
 
-## Sprint Ativa
+## 🎯 Sprint Ativa
 
-**Sprint 7 — Edicao de Classificacao Manual**
-
-- Feature: [edicao-classificacao.md](../features/edicao-classificacao.md)
-- Fase: TDD (RED -> GREEN)
-- Progresso: 0%
-
-### Objetivo
-Substituir o toggle binario por um modal de confirmacao onde o operador
-escolhe explicitamente PESSOAL ou ADMINISTRATIVO antes de salvar.
-
-### Proximos passos
-1. Escrever testes (RED) — DashboardTest
-2. Implementar propriedades e metodos no Dashboard.php (GREEN)
-3. Atualizar view com modal Livewire
-4. Verificar 47 + N testes passando
+*Nenhuma sprint em execução no momento.*
 
 ---
 
-## Como concluir esta sprint
+## 📝 Como iniciar uma sprint
 
-1. Marcar todos os criterios de aceite em `../features/edicao-classificacao.md`
-2. Mover feature para `../history/2026-02/`
-3. Atualizar ROADMAP.md Sprint 7 como CONCLUIDA
-4. Atualizar este README para "Nenhuma sprint em execucao"
+Quando uma feature for priorizada para execução:
+
+1. **Copiar** ou linkar a feature de `../features/` para esta pasta
+2. **Definir** sprint no ROADMAP.md
+3. **Criar** `sprint-status.json` em `.aidev/state/`
+4. **Atualizar** `unified.json` com tasks
+5. **Iniciar** desenvolvimento
 
 ---
 
-## Status
+## ✅ Como concluir uma sprint
 
-- Sprint atual: 7 — Edicao de Classificacao Manual
-- Fase: Iniciando
-- Progresso historico: 6/6 sprints anteriores concluidas (100%)
+Quando uma sprint for concluída:
+
+1. **Mover** feature arquivada para `../history/YYYY-MM/`
+2. **Limpar** esta pasta
+3. **Atualizar** ROADMAP.md (marcar como concluída)
+4. **Criar** release notes se necessário
+5. **Taggear** versão no git
+
+---
+
+## 📊 Status
+
+- **Sprint atual:** Nenhuma
+- **Fase:** -  
+- **Progresso:** 0%
+
+---
+
+*Última atualização: *

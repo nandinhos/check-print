@@ -1,42 +1,32 @@
-# Features - Planejadas
+# 🚀 Features - Planejados
 
-> Features com planejamento completo, prontos para execucao
-> Atualizado: 2026-02-19
-
----
-
-## Features Concluidas
-
-| Feature | Sprint | Status | Arquivo |
-|---------|--------|--------|---------|
-| Core System Setup | 1 | CONCLUIDA | [core-system-setup.md](core-system-setup.md) |
-
-> Todas as features do escopo original foram concluidas e arquivadas em
-> [history/2026-02/](../history/2026-02/sprints-concluidas.md)
+> Features com planejamento completo, prontos para execução
 
 ---
 
-## Features em Planejamento
+## 📋 Features em Planejamento
 
-Nenhuma feature em planejamento no momento.
-
-Para proximas features, consulte o backlog em [backlog/README.md](../backlog/README.md).
+*Nenhuma feature planejada no momento.*
 
 ---
 
-## Proximos Passos
+## 🎯 Próximos Passos
 
-Quando uma feature do backlog for priorizada:
+Quando uma feature for priorizada para execução:
 
-1. Criar arquivo `nome-da-feature.md` nesta pasta
-2. Definir sprint no ROADMAP.md
-3. Criar entrada em `../current/`
-4. Iniciar desenvolvimento com TDD
+1. **Definir** sprint no ROADMAP.md
+2. **Criar** entrada em `../current/`
+3. **Atualizar** este README (mover para seção "Em Execução")
+4. **Iniciar** desenvolvimento
 
 ---
 
-## Estatisticas
+## 📊 Estatísticas
 
-- Features concluidas: 1 (core-system-setup — Sprint 1 a 6)
-- Features em planejamento: 0
-- Em execucao: 0
+- **Features planejadas:** 0
+- **Prontas para execução:** 0
+- **Em execução:** 0
+
+---
+
+*Última atualização: *

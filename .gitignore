@@ -1,0 +1,5 @@
+# AI Dev Superpowers
+
+# AI Dev State (dynamic session data)
+.aidev/state/
+.env
