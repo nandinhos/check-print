@@ -137,7 +137,7 @@
 
     {{-- Filtros --}}
     <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 
             {{-- Date Range --}}
             <div>
@@ -158,16 +158,6 @@
                 >
             </div>
 
-            {{-- Presets --}}
-            <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1.5">Periodo Rapido</label>
-                <div class="flex gap-1.5">
-                    <button wire:click="setPreset('ultimos30')" class="flex-1 text-xs px-2 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600 transition-colors">30d</button>
-                    <button wire:click="setPreset('esteMes')" class="flex-1 text-xs px-2 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600 transition-colors">Mes</button>
-                    <button wire:click="setPreset('anoAtual')" class="flex-1 text-xs px-2 py-2 border border-slate-300 rounded-lg hover:bg-slate-50 text-slate-600 transition-colors">Ano</button>
-                </div>
-            </div>
-
             {{-- Tipo Toggle --}}
             <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1.5">Tipo</label>
@@ -181,19 +171,22 @@
                 </select>
             </div>
 
-            {{-- Busca por usuario --}}
+            {{-- Select de usuario --}}
             <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1.5">Filtrar por Usuario</label>
-                <input
-                    type="text"
-                    wire:model.live.debounce.300ms="filtroUsuario"
-                    placeholder="Nome do usuario..."
+                <select
+                    wire:model.live="filtroUsuario"
                     class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 >
+                    <option value="">Todos os usuarios</option>
+                    @foreach($usuarios as $usuario)
+                        <option value="{{ $usuario }}">{{ $usuario }}</option>
+                    @endforeach
+                </select>
             </div>
 
             {{-- Busca por documento --}}
-            <div class="md:col-span-2">
+            <div>
                 <label class="block text-xs font-medium text-slate-600 mb-1.5">Buscar por Documento</label>
                 <input
                     type="text"
@@ -204,10 +197,10 @@
             </div>
 
             {{-- Botoes de exportacao --}}
-            <div class="flex items-end gap-2">
+            <div class="flex items-end gap-2 lg:col-span-3 justify-end">
                 <a
                     href="{{ route('export.excel') }}?data_inicio={{ $dataInicio }}&data_fim={{ $dataFim }}&usuario={{ $filtroUsuario }}&tipo={{ $filtroTipo }}&documento={{ $buscaDocumento }}"
-                    class="flex items-center gap-1.5 px-3 py-2 border border-slate-300 text-slate-600 text-xs rounded-lg hover:bg-slate-50 transition-colors"
+                    class="flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
                 >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -216,7 +209,7 @@
                 </a>
                 <a
                     href="{{ route('export.pdf') }}?data_inicio={{ $dataInicio }}&data_fim={{ $dataFim }}&usuario={{ $filtroUsuario }}&tipo={{ $filtroTipo }}"
-                    class="flex items-center gap-1.5 px-3 py-2 border border-slate-300 text-slate-600 text-xs rounded-lg hover:bg-slate-50 transition-colors"
+                    class="flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors"
                 >
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
@@ -345,22 +338,35 @@
                                     R$ {{ number_format($log->custo, 2, ',', '.') }}
                                 </td>
                                 <td class="px-4 py-3 text-center">
-                                    <button
-                                        wire:click="abrirModalEdicao({{ $log->id }})"
-                                        title="{{ $log->isManual() ? 'Editado manualmente — clique para alterar' : 'Clique para alterar classificacao' }}"
-                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:scale-105
-                                            {{ $log->classificacao === 'PESSOAL'
-                                                ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-                                                : 'bg-violet-100 text-violet-800 hover:bg-violet-200' }}"
-                                    >
-                                        {{ $log->classificacao }}
+                                    <div class="inline-flex items-center gap-1">
+                                        <button
+                                            wire:click="abrirModalEdicao({{ $log->id }})"
+                                            title="{{ $log->isManual() ? 'Editado manualmente — clique para alterar' : 'Clique para alterar classificacao' }}"
+                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:scale-105
+                                                {{ $log->classificacao === 'PESSOAL'
+                                                    ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
+                                                    : 'bg-violet-100 text-violet-800 hover:bg-violet-200' }}"
+                                        >
+                                            {{ $log->classificacao }}
+                                            @if($log->isManual())
+                                                <span
+                                                    title="Classificacao difere da sugerida automaticamente"
+                                                    class="w-1.5 h-1.5 bg-current rounded-full opacity-70"
+                                                ></span>
+                                            @endif
+                                        </button>
                                         @if($log->isManual())
-                                            <span
-                                                title="Classificacao difere da sugerida automaticamente"
-                                                class="w-1.5 h-1.5 bg-current rounded-full opacity-70"
-                                            ></span>
+                                            <button
+                                                wire:click="reverterClassificacao({{ $log->id }})"
+                                                title="Reverter para classificacao original: {{ $log->classificacao_auto }}"
+                                                class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-slate-600 p-0.5"
+                                            >
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                                                </svg>
+                                            </button>
                                         @endif
-                                    </button>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

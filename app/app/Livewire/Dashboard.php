@@ -41,13 +41,15 @@ class Dashboard extends Component
     public string $modalUsuario = '';
     public string $modalClassificacaoAtual = '';
 
-    // Usuarios para autocomplete
+    // Usuarios para select
     public array $usuarios = [];
-    public array $usuariosSugestoes = [];
 
     public function mount(): void
     {
-        $this->dataInicio = now()->startOfMonth()->format('Y-m-d');
+        $oldest = PrintLog::min('data_impressao');
+        $this->dataInicio = $oldest
+            ? \Carbon\Carbon::parse($oldest)->format('Y-m-d')
+            : now()->format('Y-m-d');
         $this->dataFim = now()->format('Y-m-d');
         $this->carregarUsuarios();
         $this->calcularKpis();
@@ -69,7 +71,6 @@ class Dashboard extends Component
     {
         $this->resetPage();
         $this->calcularKpis();
-        $this->buscarSugestoesUsuario();
     }
 
     public function updatedFiltroTipo(): void
@@ -81,28 +82,6 @@ class Dashboard extends Component
     public function updatedBuscaDocumento(): void
     {
         $this->resetPage();
-    }
-
-    public function setPreset(string $preset): void
-    {
-        match ($preset) {
-            'ultimos30' => [
-                $this->dataInicio = now()->subDays(30)->format('Y-m-d'),
-                $this->dataFim    = now()->format('Y-m-d'),
-            ],
-            'esteMes' => [
-                $this->dataInicio = now()->startOfMonth()->format('Y-m-d'),
-                $this->dataFim    = now()->endOfMonth()->format('Y-m-d'),
-            ],
-            'anoAtual' => [
-                $this->dataInicio = now()->startOfYear()->format('Y-m-d'),
-                $this->dataFim    = now()->endOfYear()->format('Y-m-d'),
-            ],
-            default => null,
-        };
-
-        $this->resetPage();
-        $this->calcularKpis();
     }
 
     public function abrirModalEdicao(int $id): void
@@ -138,6 +117,31 @@ class Dashboard extends Component
         }
 
         $this->fecharModal();
+    }
+
+    public function reverterClassificacao(int $id): void
+    {
+        $log = PrintLog::findOrFail($id);
+
+        if (! $log->isManual()) {
+            return;
+        }
+
+        $anterior = $log->classificacao;
+
+        $log->update([
+            'classificacao'        => $log->classificacao_auto,
+            'classificacao_origem' => 'AUTO',
+        ]);
+
+        ManualOverride::create([
+            'print_log_id'           => $log->id,
+            'classificacao_anterior' => $anterior,
+            'classificacao_nova'     => $log->classificacao_auto,
+            'alterado_por'           => 'operador',
+        ]);
+
+        $this->calcularKpis();
     }
 
     public function fecharModal(): void
@@ -213,7 +217,7 @@ class Dashboard extends Component
         }
 
         if ($this->filtroUsuario) {
-            $query->where('usuario', 'like', '%' . $this->filtroUsuario . '%');
+            $query->where('usuario', $this->filtroUsuario);
         }
 
         if ($this->filtroTipo !== 'todos') {
@@ -238,7 +242,7 @@ class Dashboard extends Component
             $query->whereDate('data_impressao', '<=', $this->dataFim);
         }
         if ($this->filtroUsuario) {
-            $query->where('usuario', 'like', '%' . $this->filtroUsuario . '%');
+            $query->where('usuario', $this->filtroUsuario);
         }
 
         $totais = (clone $query)->selectRaw('
@@ -263,21 +267,6 @@ class Dashboard extends Component
     {
         $this->usuarios = PrintLog::distinct()
             ->orderBy('usuario')
-            ->pluck('usuario')
-            ->toArray();
-    }
-
-    private function buscarSugestoesUsuario(): void
-    {
-        if (strlen($this->filtroUsuario) < 2) {
-            $this->usuariosSugestoes = [];
-            return;
-        }
-
-        $this->usuariosSugestoes = PrintLog::where('usuario', 'like', '%' . $this->filtroUsuario . '%')
-            ->distinct()
-            ->orderBy('usuario')
-            ->limit(10)
             ->pluck('usuario')
             ->toArray();
     }
