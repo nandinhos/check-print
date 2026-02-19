@@ -2,7 +2,10 @@
   "mcpServers": {
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@latest"],
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ],
       "env": {
         "CONTEXT7_API_KEY": ""
       },
@@ -10,12 +13,22 @@
     },
     "serena": {
       "command": "uvx",
-      "args": ["serena", "--project=."],
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context=claude-code",
+        "--project-from-cwd"
+      ],
       "description": "Serena server for intelligent code navigation"
     },
     "basic-memory": {
       "command": "uvx",
-      "args": ["basic-memory", "mcp"],
+      "args": [
+        "basic-memory",
+        "mcp"
+      ],
       "description": "Persistent memory for cross-session knowledge"
     }
   },
