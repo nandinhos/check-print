@@ -1,45 +1,34 @@
-# 🏃 Current - Em Execução
+# Current - Em Execucao
 
 > Sprint ativa sendo executada no momento
+> Atualizado: 2026-02-19
 
 ---
 
-## 🎯 Sprint Ativa
+## Sprint Ativa
 
-*Nenhuma sprint em execução no momento.*
+Nenhuma sprint em execucao. Todas as 6 sprints do escopo original foram concluidas.
 
----
-
-## 📝 Como iniciar uma sprint
-
-Quando uma feature for priorizada para execução:
-
-1. **Copiar** ou linkar a feature de `../features/` para esta pasta
-2. **Definir** sprint no ROADMAP.md
-3. **Criar** `sprint-status.json` em `.aidev/state/`
-4. **Atualizar** `unified.json` com tasks
-5. **Iniciar** desenvolvimento
+Proximas acoes possiveis:
+- Priorizar itens do backlog para uma nova sprint
+- Ver [backlog/README.md](../backlog/README.md) para ideias futuras
+- Ver [ROADMAP.md](../ROADMAP.md) secao "Backlog Futuro"
 
 ---
 
-## ✅ Como concluir uma sprint
+## Como iniciar uma sprint
 
-Quando uma sprint for concluída:
+Quando uma feature for priorizada para execucao:
 
-1. **Mover** feature arquivada para `../history/YYYY-MM/`
-2. **Limpar** esta pasta
-3. **Atualizar** ROADMAP.md (marcar como concluída)
-4. **Criar** release notes se necessário
-5. **Taggear** versão no git
-
----
-
-## 📊 Status
-
-- **Sprint atual:** Nenhuma
-- **Fase:** -  
-- **Progresso:** 0%
+1. Copiar ou linkar a feature de `../features/` para esta pasta
+2. Definir sprint no ROADMAP.md
+3. Iniciar desenvolvimento com TDD (RED -> GREEN -> REFACTOR)
+4. Ao concluir: mover para `../history/YYYY-MM/` e atualizar ROADMAP.md
 
 ---
 
-*Última atualização: *
+## Status
+
+- Sprint atual: Nenhuma
+- Fase: -
+- Progresso: 6/6 sprints concluidas (100%)
