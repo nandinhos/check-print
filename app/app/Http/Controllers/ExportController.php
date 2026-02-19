@@ -14,11 +14,11 @@ class ExportController extends Controller
 {
     public function excel(Request $request): BinaryFileResponse
     {
-        $dataInicio     = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
-        $dataFim        = $request->get('data_fim', now()->format('Y-m-d'));
-        $filtroUsuario  = $request->get('usuario', '');
-        $filtroTipo     = $request->get('tipo', 'todos');
-        $buscaDocumento = $request->get('documento', '');
+        $dataInicio     = $request->get('data_inicio') ?? now()->startOfMonth()->format('Y-m-d');
+        $dataFim        = $request->get('data_fim') ?? now()->format('Y-m-d');
+        $filtroUsuario  = $request->get('usuario') ?? '';
+        $filtroTipo     = $request->get('tipo') ?? 'todos';
+        $buscaDocumento = $request->get('documento') ?? '';
 
         $filename = 'auditoria-impressoes-' . now()->format('Ymd-His') . '.xlsx';
 
@@ -30,9 +30,9 @@ class ExportController extends Controller
 
     public function pdf(Request $request): Response
     {
-        $dataInicio    = $request->get('data_inicio', now()->startOfMonth()->format('Y-m-d'));
-        $dataFim       = $request->get('data_fim', now()->format('Y-m-d'));
-        $filtroUsuario = $request->get('usuario', '');
+        $dataInicio    = $request->get('data_inicio') ?? now()->startOfMonth()->format('Y-m-d');
+        $dataFim       = $request->get('data_fim') ?? now()->format('Y-m-d');
+        $filtroUsuario = $request->get('usuario') ?? '';
 
         $totais = PrintLog::query()
             ->when($dataInicio, fn ($q) => $q->whereDate('data_impressao', '>=', $dataInicio))
