@@ -30,6 +30,14 @@
         "mcp"
       ],
       "description": "Persistent memory for cross-session knowledge"
+    },
+    "laravel-boost": {
+      "command": "php",
+      "args": [
+        "/home/gacpac/projects/check-print/app/artisan",
+        "boost:mcp"
+      ],
+      "description": "Laravel Boost MCP server for Laravel-specific tools"
     }
   },
   "projectConfig": {
