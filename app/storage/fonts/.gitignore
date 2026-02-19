@@ -1,0 +1,3 @@
+# Fontes geradas em runtime pelo DomPDF
+*.ufm.json
+*.afm.json
