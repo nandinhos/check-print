@@ -125,6 +125,7 @@ class ImportCsv extends Component
                     'custo'                => $row['custo'],
                     'aplicativo'           => $row['aplicativo'],
                     'classificacao'        => $resultado['classificacao'],
+                    'classificacao_auto'   => $resultado['classificacao'],
                     'classificacao_origem' => 'AUTO',
                 ]);
 

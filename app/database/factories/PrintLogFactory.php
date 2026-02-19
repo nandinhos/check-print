@@ -49,6 +49,7 @@ class PrintLogFactory extends Factory
             'custo' => $this->faker->randomFloat(4, 0.02, 5.00),
             'aplicativo' => $this->faker->randomElement(['PDF', 'Chrome', 'Word', 'Excel', 'Firefox']),
             'classificacao' => $isPessoal ? 'PESSOAL' : 'ADMINISTRATIVO',
+            'classificacao_auto' => $isPessoal ? 'PESSOAL' : 'ADMINISTRATIVO',
             'classificacao_origem' => 'AUTO',
         ];
     }

@@ -10,13 +10,9 @@
 | # | Ideia | Prioridade | Complexidade |
 |---|-------|------------|--------------|
 | 1 | Queue/Job para CSVs grandes (>1000 linhas) com barra de progresso | ALTA | Media |
-| 2 | Undo de override manual — reverter para classificacao original | ALTA | Baixa |
-| 3 | Autocomplete de usuario nos filtros do dashboard | MEDIA | Baixa |
-| 4 | Ordenacao por coluna na tabela do dashboard | MEDIA | Baixa |
-| 5 | Paginacao do painel de duplicatas na importacao | BAIXA | Baixa |
-| 6 | Autenticacao de usuarios (login/logout/perfis) | ALTA | Alta |
-| 7 | Multi-tenant (suporte a multiplas organizacoes) | MEDIA | Alta |
-| 8 | Notificacoes por email de relatorio mensal automatico | BAIXA | Media |
+| 2 | Autocomplete de usuario nos filtros do dashboard | MEDIA | Baixa |
+| 3 | Ordenacao por coluna na tabela do dashboard | MEDIA | Baixa |
+| 4 | Autenticacao de usuarios (login/logout/perfis) | ALTA | Alta |
 
 ---
 
@@ -34,6 +30,6 @@ Quando uma ideia for priorizada:
 
 ## Estatisticas
 
-- Total de ideias: 8
-- Prontas para priorizacao: 2 (undo override, autocomplete)
-- Em analise: 0
+- Total de ideias: 4
+- Prontas para priorizacao: 1 (autocomplete)
+- Em execucao: 1 (edicao de classificacao — Sprint 7)

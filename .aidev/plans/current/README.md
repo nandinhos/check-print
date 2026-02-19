@@ -7,28 +7,35 @@
 
 ## Sprint Ativa
 
-Nenhuma sprint em execucao. Todas as 6 sprints do escopo original foram concluidas.
+**Sprint 7 — Edicao de Classificacao Manual**
 
-Proximas acoes possiveis:
-- Priorizar itens do backlog para uma nova sprint
-- Ver [backlog/README.md](../backlog/README.md) para ideias futuras
-- Ver [ROADMAP.md](../ROADMAP.md) secao "Backlog Futuro"
+- Feature: [edicao-classificacao.md](../features/edicao-classificacao.md)
+- Fase: TDD (RED -> GREEN)
+- Progresso: 0%
+
+### Objetivo
+Substituir o toggle binario por um modal de confirmacao onde o operador
+escolhe explicitamente PESSOAL ou ADMINISTRATIVO antes de salvar.
+
+### Proximos passos
+1. Escrever testes (RED) — DashboardTest
+2. Implementar propriedades e metodos no Dashboard.php (GREEN)
+3. Atualizar view com modal Livewire
+4. Verificar 47 + N testes passando
 
 ---
 
-## Como iniciar uma sprint
+## Como concluir esta sprint
 
-Quando uma feature for priorizada para execucao:
-
-1. Copiar ou linkar a feature de `../features/` para esta pasta
-2. Definir sprint no ROADMAP.md
-3. Iniciar desenvolvimento com TDD (RED -> GREEN -> REFACTOR)
-4. Ao concluir: mover para `../history/YYYY-MM/` e atualizar ROADMAP.md
+1. Marcar todos os criterios de aceite em `../features/edicao-classificacao.md`
+2. Mover feature para `../history/2026-02/`
+3. Atualizar ROADMAP.md Sprint 7 como CONCLUIDA
+4. Atualizar este README para "Nenhuma sprint em execucao"
 
 ---
 
 ## Status
 
-- Sprint atual: Nenhuma
-- Fase: -
-- Progresso: 6/6 sprints concluidas (100%)
+- Sprint atual: 7 — Edicao de Classificacao Manual
+- Fase: Iniciando
+- Progresso historico: 6/6 sprints anteriores concluidas (100%)

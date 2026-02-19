@@ -30,6 +30,13 @@ class Dashboard extends Component
     public float $custoAdministrativo = 0;
     public float $percentualPessoal = 0;
 
+    // Modal de edicao de classificacao
+    public bool $modalAberto = false;
+    public ?int $modalPrintLogId = null;
+    public string $modalDocumento = '';
+    public string $modalUsuario = '';
+    public string $modalClassificacaoAtual = '';
+
     // Usuarios para autocomplete
     public array $usuarios = [];
     public array $usuariosSugestoes = [];
@@ -94,25 +101,48 @@ class Dashboard extends Component
         $this->calcularKpis();
     }
 
-    public function alternarClassificacao(int $id): void
+    public function abrirModalEdicao(int $id): void
     {
         $log = PrintLog::findOrFail($id);
-        $anterior = $log->classificacao;
-        $nova = $anterior === 'PESSOAL' ? 'ADMINISTRATIVO' : 'PESSOAL';
+        $this->modalPrintLogId = $log->id;
+        $this->modalDocumento = $log->documento;
+        $this->modalUsuario = $log->usuario;
+        $this->modalClassificacaoAtual = $log->classificacao;
+        $this->modalAberto = true;
+    }
 
-        $log->update([
-            'classificacao' => $nova,
-            'classificacao_origem' => 'MANUAL',
-        ]);
+    public function salvarClassificacao(string $novaClassificacao): void
+    {
+        $log = PrintLog::findOrFail($this->modalPrintLogId);
 
-        ManualOverride::create([
-            'print_log_id'          => $log->id,
-            'classificacao_anterior' => $anterior,
-            'classificacao_nova'     => $nova,
-            'alterado_por'          => 'operador',
-        ]);
+        if ($novaClassificacao !== $log->classificacao) {
+            $anterior = $log->classificacao;
 
-        $this->calcularKpis();
+            $log->update([
+                'classificacao' => $novaClassificacao,
+                'classificacao_origem' => 'MANUAL',
+            ]);
+
+            ManualOverride::create([
+                'print_log_id'           => $log->id,
+                'classificacao_anterior' => $anterior,
+                'classificacao_nova'     => $novaClassificacao,
+                'alterado_por'           => 'operador',
+            ]);
+
+            $this->calcularKpis();
+        }
+
+        $this->fecharModal();
+    }
+
+    public function fecharModal(): void
+    {
+        $this->modalAberto = false;
+        $this->modalPrintLogId = null;
+        $this->modalDocumento = '';
+        $this->modalUsuario = '';
+        $this->modalClassificacaoAtual = '';
     }
 
     #[On('csv-importado')]

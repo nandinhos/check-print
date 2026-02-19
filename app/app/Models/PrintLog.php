@@ -18,6 +18,7 @@ class PrintLog extends Model
         'custo',
         'aplicativo',
         'classificacao',
+        'classificacao_auto',
         'classificacao_origem',
     ];
 
@@ -39,6 +40,6 @@ class PrintLog extends Model
 
     public function isManual(): bool
     {
-        return $this->classificacao_origem === 'MANUAL';
+        return $this->classificacao !== $this->classificacao_auto;
     }
 }

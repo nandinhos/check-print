@@ -1,5 +1,94 @@
 <div class="space-y-6">
 
+    {{-- Modal de edicao de classificacao --}}
+    @if($modalAberto)
+    <div class="fixed inset-0 z-50 flex items-center justify-center">
+        {{-- Backdrop --}}
+        <div
+            class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+            wire:click="fecharModal"
+        ></div>
+
+        {{-- Painel do modal --}}
+        <div class="relative bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md mx-4 p-6">
+
+            {{-- Header --}}
+            <div class="flex items-start justify-between mb-5">
+                <div>
+                    <h2 class="text-base font-semibold text-slate-800">Alterar Classificacao</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Escolha a classificacao correta para este registro</p>
+                </div>
+                <button wire:click="fecharModal" class="text-slate-400 hover:text-slate-600 transition-colors p-1 -mr-1 -mt-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Informacoes do registro --}}
+            <div class="bg-slate-50 rounded-xl p-4 mb-5 space-y-1.5">
+                <div class="flex gap-2">
+                    <span class="text-xs font-medium text-slate-400 w-20 shrink-0">Usuario</span>
+                    <span class="text-xs font-medium text-slate-700">{{ $modalUsuario }}</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-xs font-medium text-slate-400 w-20 shrink-0">Documento</span>
+                    <span class="text-xs text-slate-600 leading-tight">{{ $modalDocumento }}</span>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <span class="text-xs font-medium text-slate-400 w-20 shrink-0">Atual</span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                        {{ $modalClassificacaoAtual === 'PESSOAL'
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-violet-100 text-violet-800' }}">
+                        {{ $modalClassificacaoAtual }}
+                    </span>
+                </div>
+            </div>
+
+            {{-- Botoes de selecao --}}
+            <p class="text-xs font-medium text-slate-500 mb-3">Selecione a nova classificacao:</p>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <button
+                    wire:click="salvarClassificacao('PESSOAL')"
+                    class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all
+                        {{ $modalClassificacaoAtual === 'PESSOAL'
+                            ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-200'
+                            : 'border-slate-200 hover:border-amber-300 hover:bg-amber-50' }}"
+                >
+                    <span class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+                        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                    </span>
+                    <span class="text-sm font-semibold text-amber-800">PESSOAL</span>
+                    <span class="text-xs text-amber-600 text-center leading-tight">Documento pessoal do funcionario</span>
+                </button>
+
+                <button
+                    wire:click="salvarClassificacao('ADMINISTRATIVO')"
+                    class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all
+                        {{ $modalClassificacaoAtual === 'ADMINISTRATIVO'
+                            ? 'border-violet-400 bg-violet-50 ring-2 ring-violet-200'
+                            : 'border-slate-200 hover:border-violet-300 hover:bg-violet-50' }}"
+                >
+                    <span class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
+                        <span class="w-3 h-3 rounded-full bg-violet-400"></span>
+                    </span>
+                    <span class="text-sm font-semibold text-violet-800">ADMINISTRATIVO</span>
+                    <span class="text-xs text-violet-600 text-center leading-tight">Documento de uso corporativo</span>
+                </button>
+            </div>
+
+            {{-- Botao cancelar --}}
+            <button
+                wire:click="fecharModal"
+                class="w-full py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+            >
+                Cancelar — manter como esta
+            </button>
+        </div>
+    </div>
+    @endif
+
     {{-- KPI Cards --}}
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-5">
 
@@ -200,8 +289,8 @@
                                 </td>
                                 <td class="px-4 py-3 text-center">
                                     <button
-                                        wire:click="alternarClassificacao({{ $log->id }})"
-                                        title="Clique para alternar classificacao{{ $log->isManual() ? ' (editado manualmente)' : '' }}"
+                                        wire:click="abrirModalEdicao({{ $log->id }})"
+                                        title="{{ $log->isManual() ? 'Editado manualmente — clique para alterar' : 'Clique para alterar classificacao' }}"
                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:scale-105
                                             {{ $log->classificacao === 'PESSOAL'
                                                 ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
@@ -209,7 +298,10 @@
                                     >
                                         {{ $log->classificacao }}
                                         @if($log->isManual())
-                                            <span title="Editado manualmente" class="w-1.5 h-1.5 bg-current rounded-full opacity-60"></span>
+                                            <span
+                                                title="Classificacao difere da sugerida automaticamente"
+                                                class="w-1.5 h-1.5 bg-current rounded-full opacity-70"
+                                            ></span>
                                         @endif
                                     </button>
                                 </td>

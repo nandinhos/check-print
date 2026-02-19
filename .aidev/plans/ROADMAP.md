@@ -212,16 +212,27 @@ com base em heuristicas de nomenclatura e gera relatorios gerenciais.
 
 ---
 
+---
+
+## SPRINT 7 - Edicao de Classificacao Manual
+**Objetivo**: Substituir toggle binario por modal de confirmacao com escolha explicita.
+**Status**: EM EXECUCAO
+
+### 7.1 - Modal de Edicao
+- [ ] Testes: abre_modal, salva_nova_classificacao, nao_cria_override_sem_mudanca, cancela_modal
+- [ ] Dashboard.php: propriedades do modal + abrirModalEdicao() + salvarClassificacao() + fecharModal()
+- [ ] View: modal wire:if com overlay, badge colorido, botoes [PESSOAL] [ADMINISTRATIVO] [Cancelar]
+- [ ] Badge da tabela agora abre modal (nao altera direto)
+- [ ] Indicador visual: badge "MANUAL" visivel apenas quando classificacao difere da original (AUTO)
+
+---
+
 ## BACKLOG FUTURO (nao implementado)
 
 - [ ] Queue/Job para arquivos CSV grandes (>1000 linhas) com progresso
-- [ ] Undo de override manual (reverter para classificacao original)
 - [ ] Autocomplete de usuario nos filtros do dashboard
 - [ ] Ordenacao por coluna na tabela do dashboard
-- [ ] Paginacao do painel de duplicatas na importacao
 - [ ] Autenticacao de usuarios (login/logout)
-- [ ] Multi-tenant (suporte a multiplas organizacoes)
-- [ ] Notificacoes por email de relatorio mensal
 
 ---
 
@@ -249,6 +260,6 @@ com base em heuristicas de nomenclatura e gera relatorios gerenciais.
 
 ---
 
-**Versao**: 3.0
-**Status**: Todas as sprints do escopo original concluidas
+**Versao**: 3.1
+**Status**: Sprint 7 em execucao
 **Atualizado**: 2026-02-19

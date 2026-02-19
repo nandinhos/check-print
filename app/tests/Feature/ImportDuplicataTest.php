@@ -36,6 +36,7 @@ class ImportDuplicataTest extends TestCase
             'custo'                => 0.02,
             'aplicativo'           => 'Chrome',
             'classificacao'        => 'PESSOAL',
+            'classificacao_auto'   => 'PESSOAL',
             'classificacao_origem' => 'AUTO',
         ], $overrides));
     }
