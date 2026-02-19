@@ -1,0 +1,66 @@
+{
+  "generated_at": "2026-02-18T21:05:18-03:00",
+  "aidev_version": "4.5.1",
+  "files": {
+    ".aidev/agents/architect.md": {
+      "checksum": "0ec81d35a8b26e899f4d2813f270b8b218320ab72be68680b64103110542bd6e"
+    },
+    ".aidev/agents/backend.md": {
+      "checksum": "0e6dc41246cb6b121c39dfa9f7850d618ed5e0c2dc6f47b961577a8d71b0458c"
+    },
+    ".aidev/agents/code-reviewer.md": {
+      "checksum": "cf86b0c9858b3db55a0733684129973714742ddf4bad50c81db34f4f6046f6dd"
+    },
+    ".aidev/agents/devops.md": {
+      "checksum": "3e68b8724e8b6c40485ac0258c6af7e6dc3d22c8f287f34d9df14b418e0a40e0"
+    },
+    ".aidev/agents/frontend.md": {
+      "checksum": "8e36d77f34c12c49aa54221e32d0e5e0bbb3b8a6728139e5bb4248ad8f25d795"
+    },
+    ".aidev/agents/legacy-analyzer.md": {
+      "checksum": "42333277e8b94916ec36e0e1122c7cd8840213aa47868899ddbf4a695fd5fce5"
+    },
+    ".aidev/agents/orchestrator.md": {
+      "checksum": "2597aae85d0c7d4d874fef2deb073cfd3014545fc1de6f8a450fe4f5db7eab9e"
+    },
+    ".aidev/agents/qa.md": {
+      "checksum": "7086e811dd88d564e33f96cef6d7943719b9e8f131bc868393eb34baf68e1ada"
+    },
+    ".aidev/agents/security-guardian.md": {
+      "checksum": "70da39330a8310022db669e0656d7811b13002ffbf028622513b5016b7503348"
+    },
+    ".aidev/agents/state-manager.md": {
+      "checksum": "46bc53acea2ad72e29b011276fdf3a7f908885fff6b9b558363ac778a7cf04ea"
+    },
+    ".aidev/skills/brainstorming/SKILL.md": {
+      "checksum": "59a46220c4c7217858bdefca3e7758399a5350fc35eafc068880d8dc6ab1bac3"
+    },
+    ".aidev/skills/code-review/SKILL.md": {
+      "checksum": "d0d933c0babec0188eef323ee0de99b8524c3a2f90f7ad7431e56dbfafe8379a"
+    },
+    ".aidev/skills/learned-lesson/SKILL.md": {
+      "checksum": "542e9b08c3b275cc34075c44a6ec412344772c9e5743618f65a22260b1e7011f"
+    },
+    ".aidev/skills/meta-planning/SKILL.md": {
+      "checksum": "8abe97ff64608307b96a325a6013a1025273d5272e880ee2d13dc0d706b3adb1"
+    },
+    ".aidev/skills/release-management/SKILL.md": {
+      "checksum": "102fc918c75791c88213eaf838e833b2889ce4e3910e045a069cbe50aa93b0b3"
+    },
+    ".aidev/skills/systematic-debugging/SKILL.md": {
+      "checksum": "292faba1f7c54792fa7bc15a7e54a71d87a12f12a289910322ca2f1d57baeb55"
+    },
+    ".aidev/skills/test-driven-development/SKILL.md": {
+      "checksum": "96ff54c346c9c6a97859f566fee2bde57b85c9fc5dd1d86557ec7923c1b09dc2"
+    },
+    ".aidev/skills/writing-plans/SKILL.md": {
+      "checksum": "2cbfd5aebaf4961f028c49173a2b7415c1d34286d12ad1ea8c3a4751931c6eee"
+    },
+    ".aidev/rules/generic.md": {
+      "checksum": "d1d773596ddb3dfc90cd78df3dca4b538554b02d951e3bf2e4f451ea34c11444"
+    },
+    ".aidev/rules/llm-limits.md": {
+      "checksum": "62ec173aa31c7a623b33fba3a9ed00797e3aa1f9e8294af1b3cc4010181e2693"
+    }
+  }
+}
