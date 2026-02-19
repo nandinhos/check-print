@@ -30,52 +30,42 @@ These rules apply to ALL projects regardless of stack.
 - Proper exception types
 - Log appropriately
 
-## 6. Controle de Versao
-- Commits atomicos
-- Mensagens descritivas em PORTUGUES
+## 6. Controle de Versão
+- Commits atômicos
+- Mensagens descritivas em PORTUGUÊS (Brasil)
 - Branch por feature
 - Review antes de merge
 
 ## Formato de Commit
 
-**REGRAS OBRIGATORIAS**:
-- Idioma: PORTUGUES (obrigatorio)
+**REGRAS OBRIGATÓRIAS**:
+- Idioma: PORTUGUÊS Brasil (obrigatório)
 - Emojis: PROIBIDOS
 - Co-autoria: PROIBIDA (sem Co-Authored-By)
+- Estilo: Commit Conventions
 
-### Formato
+### Padrão
 ```
-tipo(escopo): descricao curta em portugues
-
-- Detalhe 1 (opcional)
-- Detalhe 2 (opcional)
+(Escopo): Descrição detalhada do que foi feito
 ```
-
-### Tipos
-- `feat`: Nova funcionalidade
-- `fix`: Correcao de bug
-- `refactor`: Mudanca de codigo (sem nova funcionalidade)
-- `test`: Adicao de testes
-- `docs`: Documentacao
-- `chore`: Manutencao
 
 ### Exemplos Corretos
 ```
-feat(auth): adiciona autenticacao JWT
-fix(api): corrige validacao de email
-refactor(utils): extrai funcao de formatacao
+(Auth): Adiciona autenticação JWT para rotas de API
+(API): Corrige validação de e-mail no cadastro de usuários
+(Utils): Extrai função de formatação de moeda para helper global
 ```
 
-### NAO FACA
+### NÃO FAÇA
 ```
 # ERRADO - emoji
-feat(auth): :sparkles: adiciona autenticacao
+(Auth): ✨ Adiciona autenticação
 
-# ERRADO - ingles
-feat(auth): add authentication
+# ERRADO - inglês
+(Auth): Add authentication
 
 # ERRADO - co-autoria
-feat(auth): adiciona auth
+(Auth): Adiciona auth
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
