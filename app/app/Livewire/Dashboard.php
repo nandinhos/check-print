@@ -30,6 +30,10 @@ class Dashboard extends Component
     public float $custoAdministrativo = 0;
     public float $percentualPessoal = 0;
 
+    // Selecao em massa
+    public array $selecionados = [];
+    public bool  $todosSelecionados = false;
+
     // Modal de edicao de classificacao
     public bool $modalAberto = false;
     public ?int $modalPrintLogId = null;
@@ -143,6 +147,50 @@ class Dashboard extends Component
         $this->modalDocumento = '';
         $this->modalUsuario = '';
         $this->modalClassificacaoAtual = '';
+    }
+
+    public function toggleTodos(array $idsNaPagina): void
+    {
+        if ($this->todosSelecionados) {
+            $this->selecionados    = [];
+            $this->todosSelecionados = false;
+        } else {
+            $this->selecionados    = $idsNaPagina;
+            $this->todosSelecionados = true;
+        }
+    }
+
+    public function salvarClassificacaoEmMassa(array $ids, string $novaClassificacao): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        $logs = PrintLog::whereIn('id', $ids)->get();
+
+        foreach ($logs as $log) {
+            if ($novaClassificacao === $log->classificacao) {
+                continue;
+            }
+
+            $anterior = $log->classificacao;
+
+            $log->update([
+                'classificacao'        => $novaClassificacao,
+                'classificacao_origem' => 'MANUAL',
+            ]);
+
+            ManualOverride::create([
+                'print_log_id'           => $log->id,
+                'classificacao_anterior' => $anterior,
+                'classificacao_nova'     => $novaClassificacao,
+                'alterado_por'           => 'operador',
+            ]);
+        }
+
+        $this->selecionados    = [];
+        $this->todosSelecionados = false;
+        $this->calcularKpis();
     }
 
     #[On('csv-importado')]

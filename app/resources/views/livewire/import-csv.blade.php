@@ -156,42 +156,78 @@
                 @endif
 
                 {{-- Painel de duplicatas (colapsavel) --}}
-                @if($duplicatas > 0)
+                @if(count($duplicatasPorLinha) > 0)
+                    @php $totalDups = count($duplicatasPorLinha); $totalAprovadas = count($duplicatasAprovadas); @endphp
                     <div class="mt-4">
                         <button
                             wire:click="$toggle('mostrarDuplicatas')"
-                            class="w-full flex items-center justify-between px-4 py-3 bg-amber-50 border border-amber-300 rounded-lg text-sm hover:bg-amber-100 transition-colors"
+                            class="w-full flex items-center justify-between px-4 py-3 {{ $totalAprovadas === $totalDups ? 'bg-green-50 border-green-300' : 'bg-amber-50 border-amber-300' }} border rounded-lg text-sm hover:opacity-90 transition-colors"
                         >
-                            <span class="font-medium text-amber-800 flex items-center gap-2">
+                            <span class="font-medium {{ $totalAprovadas === $totalDups ? 'text-green-800' : 'text-amber-800' }} flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                 </svg>
-                                {{ $duplicatas }} {{ $duplicatas === 1 ? 'registro ja existe' : 'registros ja existem' }} no banco
-                                — serao ignorados para evitar cobran&ccedil;a dupla
+                                @if($totalAprovadas === $totalDups)
+                                    {{ $totalDups }} {{ $totalDups === 1 ? 'duplicata permitida' : 'duplicatas permitidas' }} — todas serao importadas
+                                @elseif($totalAprovadas > 0)
+                                    {{ $duplicatas }} {{ $duplicatas === 1 ? 'duplicata pendente' : 'duplicatas pendentes' }} &bull; {{ $totalAprovadas }} permitida(s)
+                                @else
+                                    {{ $duplicatas }} {{ $duplicatas === 1 ? 'registro ja existe' : 'registros ja existem' }} no banco
+                                    — serao ignorados para evitar cobran&ccedil;a dupla
+                                @endif
                             </span>
-                            <svg class="w-4 h-4 text-amber-600 transition-transform {{ $mostrarDuplicatas ? 'rotate-180' : '' }}"
+                            <svg class="w-4 h-4 {{ $totalAprovadas === $totalDups ? 'text-green-600' : 'text-amber-600' }} transition-transform {{ $mostrarDuplicatas ? 'rotate-180' : '' }}"
                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
 
                         @if($mostrarDuplicatas)
-                            <div class="mt-1 border border-amber-200 rounded-lg overflow-hidden divide-y divide-amber-100 max-h-48 overflow-y-auto">
+                            <div class="mt-1 border border-amber-200 rounded-lg overflow-hidden divide-y divide-amber-100 max-h-64 overflow-y-auto">
+                                <div class="px-4 py-2 bg-amber-50 border-b border-amber-200 flex items-center justify-between gap-3">
+                                    <p class="text-xs text-amber-700">
+                                        Marque os registros que deseja importar mesmo assim. Os desmarcados serao ignorados.
+                                    </p>
+                                    @if(count($duplicatasAprovadas) === count($duplicatasPorLinha))
+                                        <button
+                                            wire:click="desaprovarTodasDuplicatas"
+                                            class="text-xs text-amber-700 hover:text-amber-900 underline whitespace-nowrap flex-shrink-0"
+                                        >
+                                            Desmarcar todos
+                                        </button>
+                                    @else
+                                        <button
+                                            wire:click="aprovarTodasDuplicatas"
+                                            class="text-xs text-amber-700 hover:text-amber-900 underline whitespace-nowrap flex-shrink-0"
+                                        >
+                                            Selecionar todos
+                                        </button>
+                                    @endif
+                                </div>
                                 @foreach($duplicatasPorLinha as $dup)
-                                    <div class="px-4 py-2.5 bg-white flex items-center gap-3">
-                                        <span class="font-mono text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded flex-shrink-0">
+                                    @php $aprovado = in_array($dup['fingerprint'], $duplicatasAprovadas, true); @endphp
+                                    <div class="px-4 py-2.5 flex items-center gap-3 {{ $aprovado ? 'bg-green-50' : 'bg-white' }}">
+                                        <label class="flex items-center gap-2 cursor-pointer flex-shrink-0">
+                                            <input
+                                                type="checkbox"
+                                                wire:click="toggleDuplicataAprovada('{{ $dup['fingerprint'] }}')"
+                                                @checked($aprovado)
+                                                class="w-4 h-4 rounded border-amber-400 text-green-600 cursor-pointer"
+                                            >
+                                        </label>
+                                        <span class="font-mono text-xs {{ $aprovado ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }} px-2 py-0.5 rounded flex-shrink-0">
                                             Linha {{ $dup['linha'] }}
                                         </span>
-                                        <span class="text-xs text-amber-800 flex-1 truncate">
+                                        <span class="text-xs {{ $aprovado ? 'text-green-800' : 'text-amber-800' }} flex-1 truncate">
                                             <strong>{{ $dup['usuario'] }}</strong>
                                             &mdash; {{ $dup['documento'] }}
                                         </span>
-                                        <span class="text-xs text-amber-600 font-mono flex-shrink-0">
+                                        <span class="text-xs {{ $aprovado ? 'text-green-600' : 'text-amber-600' }} font-mono flex-shrink-0">
                                             {{ \Carbon\Carbon::parse($dup['data'])->format('d/m/Y H:i') }}
                                             &bull; {{ $dup['paginas'] }} pag.
                                         </span>
-                                        <span class="text-xs px-1.5 py-0.5 rounded bg-amber-200 text-amber-800 flex-shrink-0">
-                                            {{ $dup['origem'] === 'banco' ? 'no banco' : 'no arquivo' }}
+                                        <span class="text-xs px-1.5 py-0.5 rounded {{ $aprovado ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800' }} flex-shrink-0">
+                                            {{ $aprovado ? 'permitida' : ($dup['origem'] === 'banco' ? 'no banco' : 'no arquivo') }}
                                         </span>
                                     </div>
                                 @endforeach

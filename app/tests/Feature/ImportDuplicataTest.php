@@ -163,12 +163,67 @@ class ImportDuplicataTest extends TestCase
     }
 
     /** @test */
-    public function indice_unico_impede_insercao_duplicada_no_banco(): void
+    public function banco_permite_duplicatas_quando_aprovadas_explicitamente(): void
+    {
+        // A constraint unique foi removida: o banco aceita duplicatas.
+        // A deduplicacao e responsabilidade do DuplicataService em software.
+        $this->criarRegistro();
+        $this->criarRegistro(); // mesmos dados — deve inserir sem erro
+
+        $this->assertSame(2, PrintLog::count());
+    }
+
+    /** @test */
+    public function verifica_lote_inclui_fingerprint_para_aprovacao(): void
     {
         $this->criarRegistro();
 
-        $this->expectException(\Illuminate\Database\QueryException::class);
+        $service = new DuplicataService();
+        $rows    = [$this->makeRow(['_linha' => 2])];
 
-        $this->criarRegistro(); // mesmos dados — deve lancar excecao de unique constraint
+        $resultado = $service->verificarLote($rows);
+
+        $this->assertCount(1, $resultado['duplicatas']);
+        $this->assertArrayHasKey('fingerprint', $resultado['duplicatas'][0]);
+    }
+
+    /** @test */
+    public function verifica_lote_com_aprovadas_move_duplicata_para_novos(): void
+    {
+        $this->criarRegistro();
+
+        $service = new DuplicataService();
+        $row     = $this->makeRow(['_linha' => 2]);
+        $rows    = [$row];
+
+        // Primeiro: obter o fingerprint da duplicata
+        $resultado = $service->verificarLote($rows);
+        $fp        = $resultado['duplicatas'][0]['fingerprint'];
+
+        // Segundo: verificar novamente passando o fingerprint como aprovado
+        $resultado2 = $service->verificarLote($rows, aprovadas: [$fp]);
+
+        $this->assertCount(0, $resultado2['duplicatas']);
+        $this->assertCount(1, $resultado2['novos']);
+    }
+
+    /** @test */
+    public function verifica_lote_duplicata_interna_aprovada_salva_apenas_primeira(): void
+    {
+        // Banco vazio — duas linhas identicas no CSV, usuario aprova a duplicata interna
+        $service = new DuplicataService();
+        $rows    = [
+            $this->makeRow(['_linha' => 2]),
+            $this->makeRow(['_linha' => 3]), // duplicata interna
+        ];
+
+        $resultado = $service->verificarLote($rows);
+        $fp        = $resultado['duplicatas'][0]['fingerprint'];
+
+        // Aprova a duplicata interna: ambas devem ser importadas
+        $resultado2 = $service->verificarLote($rows, aprovadas: [$fp]);
+
+        $this->assertCount(0, $resultado2['duplicatas']);
+        $this->assertCount(2, $resultado2['novos']);
     }
 }

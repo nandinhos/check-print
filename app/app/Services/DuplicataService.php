@@ -22,12 +22,13 @@ class DuplicataService
 
     /**
      * Verifica um lote de linhas contra o banco e contra si mesmo (duplicatas internas).
-     * Retorna ['novos' => [], 'duplicatas' => [['linha' => N, 'registro' => [...]]]]
+     * Duplicatas cujo fingerprint esteja em $aprovadas sao tratadas como novos registros.
      *
-     * @param  array<int, array<string, mixed>> $rows  Linhas ja validadas (_valido = true)
+     * @param  array<int, array<string, mixed>> $rows      Linhas ja validadas (_valido = true)
+     * @param  array<string>                    $aprovadas Fingerprints aprovados pelo usuario
      * @return array{novos: array, duplicatas: array}
      */
-    public function verificarLote(array $rows): array
+    public function verificarLote(array $rows, array $aprovadas = []): array
     {
         $novos      = [];
         $duplicatas = [];
@@ -41,14 +42,15 @@ class DuplicataService
             $duplicataInterna = isset($vistos[$fp]);
             $duplicataDB      = ! $duplicataInterna && $this->isDuplicata($row);
 
-            if ($duplicataInterna || $duplicataDB) {
+            if (($duplicataInterna || $duplicataDB) && ! in_array($fp, $aprovadas, true)) {
                 $duplicatas[] = [
-                    'linha'    => $row['_linha'],
-                    'usuario'  => $row['usuario'],
-                    'documento'=> $row['documento'],
-                    'data'     => $row['data_impressao'],
-                    'paginas'  => $row['paginas'],
-                    'origem'   => $duplicataDB ? 'banco' : 'arquivo',
+                    'linha'       => $row['_linha'],
+                    'usuario'     => $row['usuario'],
+                    'documento'   => $row['documento'],
+                    'data'        => $row['data_impressao'],
+                    'paginas'     => $row['paginas'],
+                    'origem'      => $duplicataDB ? 'banco' : 'arquivo',
+                    'fingerprint' => $fp,
                 ];
             } else {
                 $vistos[$fp] = true;

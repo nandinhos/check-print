@@ -29,12 +29,13 @@ class ImportCsv extends Component
     public string $status       = 'idle';
     public string $mensagemErro = '';
 
-    public array $preview          = [];
-    public array $errosPorLinha    = [];
-    public array $duplicatasPorLinha = [];
-    public bool  $mostrarPreview   = false;
-    public bool  $mostrarErros     = false;
-    public bool  $mostrarDuplicatas = false;
+    public array $preview              = [];
+    public array $errosPorLinha        = [];
+    public array $duplicatasPorLinha   = [];
+    public array $duplicatasAprovadas  = []; // fingerprints aprovados pelo usuario
+    public bool  $mostrarPreview       = false;
+    public bool  $mostrarErros         = false;
+    public bool  $mostrarDuplicatas    = false;
 
     public function updatedFile(): void
     {
@@ -70,6 +71,7 @@ class ImportCsv extends Component
         $validasRows      = array_filter($result['rows'], fn ($r) => $r['_valido']);
         $verificado       = $duplicataService->verificarLote(array_values($validasRows));
 
+        $this->duplicatasAprovadas = []; // reset ao analisar novo arquivo
         $this->validos             = count($verificado['novos']);
         $this->duplicatas          = count($verificado['duplicatas']);
         $this->duplicatasPorLinha  = $verificado['duplicatas'];
@@ -90,6 +92,38 @@ class ImportCsv extends Component
         $this->status         = 'validating';
     }
 
+    public function toggleDuplicataAprovada(string $fingerprint): void
+    {
+        if (in_array($fingerprint, $this->duplicatasAprovadas, true)) {
+            $this->duplicatasAprovadas = array_values(
+                array_filter($this->duplicatasAprovadas, fn ($fp) => $fp !== $fingerprint)
+            );
+            $this->validos--;
+            $this->duplicatas++;
+        } else {
+            $this->duplicatasAprovadas[] = $fingerprint;
+            $this->validos++;
+            $this->duplicatas--;
+        }
+    }
+
+    public function aprovarTodasDuplicatas(): void
+    {
+        $total                     = count($this->duplicatasPorLinha);
+        $jaAprovadas               = count($this->duplicatasAprovadas);
+        $this->duplicatasAprovadas = array_column($this->duplicatasPorLinha, 'fingerprint');
+        $this->validos            += $total - $jaAprovadas;
+        $this->duplicatas          = 0;
+    }
+
+    public function desaprovarTodasDuplicatas(): void
+    {
+        $jaAprovadas               = count($this->duplicatasAprovadas);
+        $this->duplicatasAprovadas = [];
+        $this->validos            -= $jaAprovadas;
+        $this->duplicatas          = count($this->duplicatasPorLinha);
+    }
+
     public function importar(): void
     {
         if (! $this->file || $this->status === 'error') {
@@ -108,7 +142,10 @@ class ImportCsv extends Component
         $result           = $parser->parseWithValidation($content);
 
         $validasRows = array_filter($result['rows'], fn ($r) => $r['_valido']);
-        $verificado  = $duplicataService->verificarLote(array_values($validasRows));
+        $verificado  = $duplicataService->verificarLote(
+            array_values($validasRows),
+            $this->duplicatasAprovadas
+        );
 
         $this->ignorados  = $result['invalidos'];
         $this->duplicatas = count($verificado['duplicatas']);
@@ -146,7 +183,7 @@ class ImportCsv extends Component
             'mostrarPreview', 'importados', 'total', 'validos',
             'invalidos', 'errosPorLinha', 'mostrarErros',
             'duplicatas', 'duplicatasPorLinha', 'mostrarDuplicatas',
-            'ignorados',
+            'duplicatasAprovadas', 'ignorados',
         ]);
         $this->status = 'idle';
     }

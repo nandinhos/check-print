@@ -232,16 +232,54 @@
 
         {{-- Header da tabela --}}
         <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-slate-700">
-                Registros de Impressao
-                <span class="ml-2 text-xs font-normal text-slate-400">{{ $logs->total() }} registros</span>
-            </h3>
-            <div wire:loading class="text-xs text-slate-400 flex items-center gap-1.5">
-                <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                </svg>
-                Atualizando...
+            <div class="flex items-center gap-3">
+                <h3 class="text-sm font-semibold text-slate-700">
+                    Registros de Impressao
+                    <span class="ml-2 text-xs font-normal text-slate-400">{{ $logs->total() }} registros</span>
+                </h3>
+                @if(count($selecionados) > 0)
+                    <span class="text-xs bg-primary-100 text-primary-800 px-2 py-0.5 rounded-full font-medium">
+                        {{ count($selecionados) }} selecionado(s)
+                    </span>
+                @endif
+            </div>
+            <div class="flex items-center gap-2">
+                {{-- Barra de acao em massa --}}
+                @if(count($selecionados) > 0)
+                    <div class="flex items-center gap-2 border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50">
+                        <span class="text-xs text-slate-500">Classificar como:</span>
+                        <button
+                            wire:click="salvarClassificacaoEmMassa({{ json_encode($selecionados) }}, 'PESSOAL')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors"
+                        >
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            PESSOAL
+                        </button>
+                        <button
+                            wire:click="salvarClassificacaoEmMassa({{ json_encode($selecionados) }}, 'ADMINISTRATIVO')"
+                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-800 hover:bg-violet-200 transition-colors"
+                        >
+                            <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
+                            ADMINISTRATIVO
+                        </button>
+                        <button
+                            wire:click="$set('selecionados', [])"
+                            class="text-xs text-slate-400 hover:text-slate-600 ml-1"
+                            title="Limpar selecao"
+                        >
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                @endif
+                <div wire:loading class="text-xs text-slate-400 flex items-center gap-1.5">
+                    <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    Atualizando...
+                </div>
             </div>
         </div>
 
@@ -262,8 +300,18 @@
         @else
             <div class="overflow-x-auto">
                 <table class="w-full">
+                    @php $idsNaPagina = $logs->pluck('id')->toArray(); @endphp
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-200">
+                            <th class="px-4 py-3 w-10">
+                                <input
+                                    type="checkbox"
+                                    wire:click="toggleTodos({{ json_encode($idsNaPagina) }})"
+                                    @checked($todosSelecionados)
+                                    class="w-4 h-4 rounded border-slate-300 text-primary-600 cursor-pointer"
+                                    title="Selecionar todos desta pagina"
+                                >
+                            </th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Data</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Usuario</th>
                             <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Documento</th>
@@ -274,7 +322,16 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach($logs as $log)
-                            <tr class="hover:bg-slate-50 transition-colors group">
+                            @php $selecionado = in_array($log->id, $selecionados); @endphp
+                            <tr class="{{ $selecionado ? 'bg-primary-50' : 'hover:bg-slate-50' }} transition-colors group">
+                                <td class="px-4 py-3">
+                                    <input
+                                        type="checkbox"
+                                        wire:model.live="selecionados"
+                                        value="{{ $log->id }}"
+                                        class="w-4 h-4 rounded border-slate-300 text-primary-600 cursor-pointer"
+                                    >
+                                </td>
                                 <td class="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">
                                     {{ $log->data_impressao->format('d/m/Y') }}
                                     <span class="text-slate-400">{{ $log->data_impressao->format('H:i') }}</span>
