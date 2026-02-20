@@ -16,7 +16,7 @@ class Graficos extends Component
 
     public function mount(): void
     {
-        $this->ano = (int) now()->format('Y');
+        $ultimoLog = \App\Models\PrintLog::latest('data_impressao')->first(); $this->ano = $ultimoLog ? (int) $ultimoLog->data_impressao->format('Y') : (int) now()->format('Y');
         $this->carregarDados();
     }
 

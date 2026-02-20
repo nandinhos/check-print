@@ -30,6 +30,10 @@ class ExportController extends Controller
 
     public function pdf(Request $request): Response
     {
+        // Aumenta os limites para o processamento de grandes volumes
+        ini_set('memory_limit', '-1'); // Sem limite para este processo
+        set_time_limit(0);             // Sem timeout para este processo
+
         $dataInicio    = $request->get('data_inicio') ?? now()->startOfMonth()->format('Y-m-d');
         $dataFim       = $request->get('data_fim') ?? now()->format('Y-m-d');
         $filtroUsuario = $request->get('usuario') ?? '';
@@ -45,6 +49,7 @@ class ExportController extends Controller
                 SUM(CASE WHEN classificacao = "PESSOAL" THEN custo ELSE 0 END) as custo_pessoal,
                 SUM(CASE WHEN classificacao = "ADMINISTRATIVO" THEN custo ELSE 0 END) as custo_admin
             ')
+            ->toBase() // Reduz drasticamente o consumo de memoria (evita instanciar models)
             ->first();
 
         $custoTotal = (float) ($totais->custo_total ?? 0);
@@ -77,6 +82,8 @@ class ExportController extends Controller
             ')
             ->groupBy('usuario')
             ->orderByDesc('total_paginas')
+            ->limit(20)
+            ->toBase() // Evita instanciar models
             ->get();
 
         $analitico = PrintLog::query()
@@ -86,15 +93,23 @@ class ExportController extends Controller
             ->orderBy('usuario')
             ->orderByRaw("CASE WHEN classificacao = 'PESSOAL' THEN 0 ELSE 1 END")
             ->orderBy('data_impressao')
+            ->toBase() // Essencial para grandes quantidades: busca apenas dados crus do banco
             ->get(['usuario', 'documento', 'data_impressao', 'paginas', 'custo', 'classificacao']);
 
         $pdf = Pdf::loadView('reports.executive', [
             'kpis'       => $kpis,
             'ranking'    => $ranking,
             'analitico'  => $analitico,
-            'dataInicio' => \Carbon\Carbon::parse($dataInicio)->format('d/m/Y'),
-            'dataFim'    => \Carbon\Carbon::parse($dataFim)->format('d/m/Y'),
-        ])->setPaper('a4');
+            'dataInicio' => \Illuminate\Support\Carbon::parse($dataInicio)->format('d/m/Y'),
+            'dataFim'    => \Illuminate\Support\Carbon::parse($dataFim)->format('d/m/Y'),
+        ]);
+        
+        // Configuracoes extras para performance e memoria
+        $pdf->getDomPDF()->set_option('enable_php', true);
+        $pdf->getDomPDF()->set_option('isHtml5ParserEnabled', true);
+        $pdf->getDomPDF()->set_option('isRemoteEnabled', false); // Desabilita fonts/imagens remotas para velocidade
+        
+        $pdf->setPaper('a4');
 
         $filename = 'relatorio-auditoria-' . now()->format('Ymd-His') . '.pdf';
 
