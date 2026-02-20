@@ -82,6 +82,16 @@ class ClassifierServiceTest extends TestCase
         $this->assertEquals('PESSOAL', $this->classifier->classify('Resultado Exame Sangue'));
     }
 
+    public function test_laudo_medico_e_pessoal(): void
+    {
+        $this->assertEquals('PESSOAL', $this->classifier->classify('Laudo Medico Dr. Joao'));
+    }
+
+    public function test_laudo_de_exame_e_pessoal(): void
+    {
+        $this->assertEquals('PESSOAL', $this->classifier->classify('Laudo de Exame de Imagem'));
+    }
+
     // --- CASOS ADMINISTRATIVO ---
 
     public function test_ficha_s1_e_classificada_como_administrativo(): void
@@ -114,6 +124,34 @@ class ClassifierServiceTest extends TestCase
         $this->assertEquals('ADMINISTRATIVO', $this->classifier->classify('Escala de Servico'));
     }
 
+    public function test_laudo_tecnico_e_administrativo(): void
+    {
+        $this->assertEquals('ADMINISTRATIVO', $this->classifier->classify('Laudo Tecnico de Computador'));
+    }
+
+    public function test_projetos_aeronaves_sao_administrativos(): void
+    {
+        $projetos = ['KC-390', 'KC-X', 'LINK-BR2', 'AM-X', 'F5-BR', 'HX-BR', 'TH-X', 'FX-32', 'Projeto SIVAM', 'Projeto RADAR'];
+        foreach ($projetos as $projeto) {
+            $this->assertEquals('ADMINISTRATIVO', $this->classifier->classify("Documento do $projeto"), "Falha ao classificar $projeto como ADMINISTRATIVO");
+        }
+    }
+
+    public function test_documentos_fiscais_sao_administrativos(): void
+    {
+        $termos = ['NF002340913', 'DANFE_23943', 'Nota Fiscal', 'Guia de Remessa'];
+        foreach ($termos as $termo) {
+            $this->assertEquals('ADMINISTRATIVO', $this->classifier->classify("Arquivo $termo"), "Falha ao classificar $termo como ADMINISTRATIVO");
+        }
+    }
+
+    public function test_veto_administrativo_vence_termo_pessoal(): void
+    {
+        // "Fatura" e pessoal, mas "KC-390" e um veto administrativo forte
+        $this->assertEquals('ADMINISTRATIVO', $this->classifier->classify('Fatura Projeto KC-390'));
+        $this->assertEquals('ADMINISTRATIVO', $this->classifier->classify('Boleto NF 12345'));
+    }
+
     public function test_documento_sem_keyword_e_administrativo_por_default(): void
     {
         $this->assertEquals('ADMINISTRATIVO', $this->classifier->classify('Documento Desconhecido XYZ'));
@@ -138,11 +176,18 @@ class ClassifierServiceTest extends TestCase
 
     // --- CONFIANCA ---
 
-    public function test_match_por_keyword_retorna_confianca_alta(): void
+    public function test_match_por_keyword_pessoal_retorna_confianca_alta(): void
     {
         $result = $this->classifier->classifyWithConfidence('Boleto Nubank');
         $this->assertEquals('PESSOAL', $result['classificacao']);
         $this->assertEquals('ALTA', $result['confianca']);
+    }
+
+    public function test_match_por_keyword_administrativa_retorna_confianca_muito_alta(): void
+    {
+        $result = $this->classifier->classifyWithConfidence('Relatorio KC-390');
+        $this->assertEquals('ADMINISTRATIVO', $result['classificacao']);
+        $this->assertEquals('MUITO ALTA', $result['confianca']);
     }
 
     public function test_default_sem_match_retorna_confianca_media(): void

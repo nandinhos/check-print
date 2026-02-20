@@ -67,12 +67,27 @@ Colunas obrigatorias: `Data`, `Hora`, `Usuario`, `Documento`, `Paginas`, `Custo`
 
 ## Classificacao Automatica
 
+O sistema utiliza um motor de heurística com **Veto Administrativo Prioritário**.
+
 | Categoria | Exemplos de palavras-chave |
 |-----------|---------------------------|
-| PESSOAL | boleto, nubank, fatura, banco, cpf, cnh, passaporte, netflix, curriculo, atestado, receita, exame |
-| ADMINISTRATIVO (default) | ficha, relatorio, oficio, memorando, portaria, escala, boletim, ata, ordem |
+| **ADMINISTRATIVO (Veto Forte)** | KC-390, AM-X, F5-BR, Projeto, Nota Fiscal, NF, DANFE, Cautela, Notebook, Laudo Técnico |
+| **PESSOAL** | boleto, nubank, fatura, banco, e-book, prescricao, biopsia, tomografia, ressonancia, exame, cpf, curriculo |
 
-Documentos sem correspondencia sao classificados como **ADMINISTRATIVO** (regra segura).
+**Regra de Ouro:** Se um documento contiver um termo Administrativo Forte (como a sigla de um projeto), ele será marcado como Administrativo mesmo que contenha termos pessoais (ex: "Fatura Projeto KC-390"). Documentos sem correspondência seguem o padrão **ADMINISTRATIVO**.
+
+## Operações de Manutenção
+
+### Reclassificação de Logs Históricos
+Sempre que a heurística de classificação no `ClassifierService` for atualizada, é recomendado rodar o script de reclassificação para manter a consistência dos dados históricos:
+
+```bash
+# Para apenas simular e ver o impacto:
+docker-compose exec app php artisan app:reclassify-logs --dry-run
+
+# Para aplicar as alterações no banco de dados:
+docker-compose exec app php artisan app:reclassify-logs
+```
 
 ## Estrutura do Projeto
 
