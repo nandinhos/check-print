@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-02-18T21:05:18-03:00",
-  "aidev_version": "4.5.1",
+  "generated_at": "2026-02-24T01:04:41-03:00",
+  "aidev_version": "4.7.0",
   "files": {
     ".aidev/agents/architect.md": {
       "checksum": "0ec81d35a8b26e899f4d2813f270b8b218320ab72be68680b64103110542bd6e"
@@ -57,7 +57,7 @@
       "checksum": "2cbfd5aebaf4961f028c49173a2b7415c1d34286d12ad1ea8c3a4751931c6eee"
     },
     ".aidev/rules/generic.md": {
-      "checksum": "d1d773596ddb3dfc90cd78df3dca4b538554b02d951e3bf2e4f451ea34c11444"
+      "checksum": "99bb3be91505166050e0483a08bfd5c6a45b3f1811d0a19c8b250aa326201b0f"
     },
     ".aidev/rules/llm-limits.md": {
       "checksum": "62ec173aa31c7a623b33fba3a9ed00797e3aa1f9e8294af1b3cc4010181e2693"

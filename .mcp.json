@@ -32,11 +32,20 @@
       "description": "Persistent memory for cross-session knowledge"
     },
     "laravel-boost": {
-      "command": "php",
+      "command": "docker",
       "args": [
-        "/home/gacpac/projects/check-print/app/artisan",
+        "compose",
+        "exec",
+        "-T",
+        "app",
+        "php",
+        "artisan",
         "boost:mcp"
       ],
+      "env": {
+        "WWWUSER": "1000",
+        "WWWGROUP": "1000"
+      },
       "description": "Laravel Boost MCP server for Laravel-specific tools"
     }
   },
