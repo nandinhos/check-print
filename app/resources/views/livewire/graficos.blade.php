@@ -1,94 +1,74 @@
 <div class="space-y-6">
 
     {{-- Seletor de Ano --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <div class="flex flex-wrap items-center gap-4">
-            <div class="flex items-center gap-3">
-                <label class="text-sm font-medium text-slate-600">Ano de referencia:</label>
-                <select
-                    wire:model.live="ano"
-                    class="text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                    @foreach($anosDisponiveis as $anoOpcao)
-                        <option value="{{ $anoOpcao }}">{{ $anoOpcao }}</option>
-                    @endforeach
-                </select>
+    <x-ui.card :glow="false" class="p-6">
+        <div class="flex flex-wrap items-center justify-between gap-6">
+            <div class="flex flex-col gap-1.5 group">
+                <label class="block text-[10px] font-bold text-muted uppercase tracking-widest ml-1">Ano de Referência</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted text-[18px] transition-colors group-focus-within:text-brand-500">calendar_today</span>
+                    <select wire:model.live="ano" class="bg-white/40 dark:bg-zinc-900/40 border border-glass backdrop-blur-md rounded-2xl text-xs font-bold uppercase py-3 pl-12 pr-10 text-main focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500/50 focus:bg-white dark:focus:bg-zinc-900 transition-all appearance-none">
+                        @foreach($anosDisponiveis as $anoOpcao)
+                            <option value="{{ $anoOpcao }}">{{ $anoOpcao }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-            <p class="text-xs text-slate-400">
-                A linha tracejada indica a media mensal — use como referencia para dimensionamento de contrato.
-            </p>
-            <div wire:loading class="text-xs text-slate-400 flex items-center gap-1.5 ml-auto">
-                <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                </svg>
-                Atualizando...
+
+            <div class="flex-1 max-w-sm">
+                <div class="flex items-start gap-3 p-3 rounded-2xl bg-brand-500/5 border border-brand-500/10">
+                    <span class="material-symbols-outlined text-brand-500 text-[18px] shrink-0">info</span>
+                    <p class="text-[10px] font-bold text-muted uppercase tracking-tight leading-relaxed">
+                        A linha tracejada indica a média mensal — utilize como referência para dimensionamento de novos contratos com a locadora.
+                    </p>
+                </div>
+            </div>
+
+            <div wire:loading class="flex items-center gap-2">
+                <span class="material-symbols-outlined animate-spin text-brand-500 text-[18px]">progress_activity</span>
+                <span class="text-[10px] font-bold text-muted uppercase tracking-widest">Sincronizando...</span>
             </div>
         </div>
-    </div>
+    </x-ui.card>
 
     {{-- KPI Cards --}}
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="bg-violet-50 rounded-xl border border-violet-200 p-5">
-            <p class="text-xs font-medium text-violet-700 uppercase tracking-wide">Total Adm. {{ $ano }}</p>
-            <p class="text-2xl font-bold text-violet-800 mt-1 font-mono">
-                {{ number_format(array_sum($dadosAdministrativo['valores'] ?? []), 0, ',', '.') }}
-            </p>
-            <p class="text-xs text-violet-500 mt-1">paginas impressas</p>
-        </div>
-        <div class="bg-violet-50 rounded-xl border border-violet-200 p-5">
-            <p class="text-xs font-medium text-violet-700 uppercase tracking-wide">Media Adm. / Mes</p>
-            <p class="text-2xl font-bold text-violet-800 mt-1 font-mono">
-                {{ number_format($dadosAdministrativo['media'] ?? 0, 1, ',', '.') }}
-            </p>
-            <p class="text-xs text-violet-500 mt-1">paginas / mes</p>
-        </div>
-        <div class="bg-amber-50 rounded-xl border border-amber-200 p-5">
-            <p class="text-xs font-medium text-amber-700 uppercase tracking-wide">Total Pessoal {{ $ano }}</p>
-            <p class="text-2xl font-bold text-amber-800 mt-1 font-mono">
-                {{ number_format(array_sum($dadosPessoal['valores'] ?? []), 0, ',', '.') }}
-            </p>
-            <p class="text-xs text-amber-500 mt-1">paginas impressas</p>
-        </div>
-        <div class="bg-amber-50 rounded-xl border border-amber-200 p-5">
-            <p class="text-xs font-medium text-amber-700 uppercase tracking-wide">Media Pessoal / Mes</p>
-            <p class="text-2xl font-bold text-amber-800 mt-1 font-mono">
-                {{ number_format($dadosPessoal['media'] ?? 0, 1, ',', '.') }}
-            </p>
-            <p class="text-xs text-amber-500 mt-1">paginas / mes</p>
-        </div>
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <x-ui.statistic label="Total Adm. {{ $ano }}" :value="number_format(array_sum($dadosAdministrativo['valores'] ?? []), 0, ',', '.')" trend="Páginas" trend-color="brand" />
+        <x-ui.statistic label="Média Adm. / Mês" :value="number_format($dadosAdministrativo['media'] ?? 0, 1, ',', '.')" trend="Mensal" trend-color="brand" />
+        <x-ui.statistic label="Total Pessoal {{ $ano }}" :value="number_format(array_sum($dadosPessoal['valores'] ?? []), 0, ',', '.')" trend="Páginas" trend-color="amber" />
+        <x-ui.statistic label="Média Pessoal / Mês" :value="number_format($dadosPessoal['media'] ?? 0, 1, ',', '.')" trend="Mensal" trend-color="amber" />
     </div>
 
     {{-- Graficos --}}
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
 
         {{-- Grafico Administrativo --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div class="mb-5">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="w-3 h-3 rounded-full bg-violet-500"></span>
-                    <h3 class="text-sm font-semibold text-slate-800">Impressoes Administrativas</h3>
+        <x-ui.card :glow="true" class="p-8" style="--glow-color: rgba(99,102,241,0.1)">
+            <div class="mb-8">
+                <div class="flex items-center gap-3 mb-1">
+                    <div class="size-2 rounded-full bg-brand-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
+                    <h3 class="text-lg font-bold font-display text-main tracking-tight">Impressões Administrativas</h3>
                 </div>
-                <p class="text-xs text-slate-400">Paginas por mes em {{ $ano }}</p>
+                <p class="text-[10px] font-bold text-muted uppercase tracking-widest">Relatório mensal de páginas — Exercício {{ $ano }}</p>
             </div>
-            <div wire:ignore>
+            <div wire:ignore class="h-[300px]">
                 <canvas id="chart-administrativo"></canvas>
             </div>
-        </div>
+        </x-ui.card>
 
         {{-- Grafico Pessoal --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div class="mb-5">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                    <h3 class="text-sm font-semibold text-slate-800">Impressoes Pessoais</h3>
+        <x-ui.card :glow="true" class="p-8" style="--glow-color: rgba(245,158,11,0.1)">
+            <div class="mb-8">
+                <div class="flex items-center gap-3 mb-1">
+                    <div class="size-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
+                    <h3 class="text-lg font-bold font-display text-main tracking-tight">Impressões Pessoais</h3>
                 </div>
-                <p class="text-xs text-slate-400">Paginas por mes em {{ $ano }}</p>
+                <p class="text-[10px] font-bold text-muted uppercase tracking-widest">Relatório mensal de páginas — Exercício {{ $ano }}</p>
             </div>
-            <div wire:ignore>
+            <div wire:ignore class="h-[300px]">
                 <canvas id="chart-pessoal"></canvas>
             </div>
-        </div>
+        </x-ui.card>
     </div>
 
     @script
@@ -97,6 +77,10 @@
         let pessoalChart = null;
 
         function buildConfig(dados, label, barColor) {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#94a3b8' : '#64748b';
+            const gridColor = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
             return {
                 type: 'bar',
                 data: {
@@ -106,18 +90,19 @@
                             type: 'bar',
                             label: label,
                             data: dados.valores,
-                            backgroundColor: barColor + '33',
+                            backgroundColor: barColor + '44',
                             borderColor: barColor,
-                            borderWidth: 1.5,
-                            borderRadius: 4,
+                            borderWidth: 2,
+                            borderRadius: 8,
                             borderSkipped: false,
+                            hoverBackgroundColor: barColor,
                         },
                         {
                             type: 'line',
                             label: 'Media mensal',
                             data: new Array(12).fill(dados.media),
-                            borderColor: '#94a3b8',
-                            borderDash: [6, 4],
+                            borderColor: isDark ? '#ffffff44' : '#00000044',
+                            borderDash: [8, 5],
                             borderWidth: 2,
                             pointRadius: 0,
                             tension: 0,
@@ -127,13 +112,30 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     interaction: { intersect: false, mode: 'index' },
                     plugins: {
                         legend: {
                             position: 'top',
-                            labels: { font: { size: 11 }, usePointStyle: true, pointStyleWidth: 10 },
+                            align: 'end',
+                            labels: {
+                                color: textColor,
+                                font: { size: 10, weight: 'bold', family: "'Space Grotesk', sans-serif" },
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                boxWidth: 6,
+                                padding: 20
+                            },
                         },
                         tooltip: {
+                            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                            titleColor: isDark ? '#f8fafc' : '#0f172a',
+                            bodyColor: isDark ? '#94a3b8' : '#64748b',
+                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 12,
+                            displayColors: true,
                             callbacks: {
                                 label: (ctx) => ` ${ctx.dataset.label}: ${Number(ctx.parsed.y).toLocaleString('pt-BR')} pag.`,
                             },
@@ -142,11 +144,17 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            ticks: { precision: 0, font: { size: 11 } },
-                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                color: textColor,
+                                font: { size: 10, family: "'JetBrains Mono', monospace" }
+                            },
+                            grid: { color: gridColor, drawBorder: false },
                         },
                         x: {
-                            ticks: { font: { size: 11 } },
+                            ticks: {
+                                color: textColor,
+                                font: { size: 10, font: 'bold', family: "'Space Grotesk', sans-serif" }
+                            },
                             grid: { display: false },
                         },
                     },
@@ -161,8 +169,8 @@
             const adminEl   = document.getElementById('chart-administrativo');
             const pessoalEl = document.getElementById('chart-pessoal');
 
-            if (adminEl)   { adminChart   = new Chart(adminEl,   buildConfig(dataAdmin,   'Impressoes Adm.',     '#8B5CF6')); }
-            if (pessoalEl) { pessoalChart = new Chart(pessoalEl, buildConfig(dataPessoal, 'Impressoes Pessoais', '#F59E0B')); }
+            if (adminEl)   { adminChart   = new Chart(adminEl,   buildConfig(dataAdmin,   'IMPRESSÕES ADM.',     '#6366f1')); }
+            if (pessoalEl) { pessoalChart = new Chart(pessoalEl, buildConfig(dataPessoal, 'IMPRESSÕES PESSOAIS', '#F59E0B')); }
         }
 
         criarGraficos(

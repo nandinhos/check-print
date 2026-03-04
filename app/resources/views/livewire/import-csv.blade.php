@@ -1,37 +1,32 @@
-<div class="max-w-3xl space-y-4">
+<div class="max-w-4xl space-y-8">
 
     {{-- Banner: Download do modelo --}}
-    <div class="bg-primary-50 border border-primary-200 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
-        <div class="flex items-start gap-3">
-            <div class="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg class="w-5 h-5 text-primary-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
+    <x-ui.card :glow="true" class="p-6 overflow-hidden" style="--glow-color: rgba(99,102,241,0.15)">
+        <div class="flex flex-wrap items-center justify-between gap-6">
+            <div class="flex items-center gap-5">
+                <div class="size-12 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-600">
+                    <span class="material-symbols-outlined text-[28px]">description</span>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-main font-display tracking-tight">Arquivo Modelo CSV</h3>
+                    <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-0.5">
+                        Formato exigido: <code class="font-mono bg-white/40 dark:bg-white/5 border border-glass px-1.5 py-0.5 rounded text-secondary">Data;Hora;Usuário;Documento;Páginas;Custo;Aplicativo</code>
+                    </p>
+                </div>
             </div>
-            <div>
-                <p class="text-sm font-semibold text-primary-900">Arquivo Modelo CSV</p>
-                <p class="text-xs text-primary-700 mt-0.5">
-                    Formato: <code class="font-mono bg-primary-100 px-1 rounded">Data;Hora;Usuario;Documento;Paginas;Custo;Aplicativo</code>
-                </p>
-            </div>
+            <x-ui.button variant="primary" icon="download" href="{{ route('export.modelo-csv') }}" download>
+                Baixar Modelo
+            </x-ui.button>
         </div>
-        <a href="{{ route('export.modelo-csv') }}"
-           download
-           class="flex items-center gap-1.5 px-4 py-2 bg-primary-900 text-white text-xs font-medium rounded-lg hover:bg-primary-800 transition-colors whitespace-nowrap flex-shrink-0">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-            </svg>
-            Baixar Modelo
-        </a>
-    </div>
+    </x-ui.card>
 
     {{-- Card principal --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <div class="mb-5">
-            <h3 class="text-base font-semibold text-slate-800">Importar Arquivo CSV</h3>
-            <p class="text-sm text-slate-500 mt-1">
-                Separador: <code class="font-mono text-xs bg-slate-100 px-1 rounded">;</code> ou <code class="font-mono text-xs bg-slate-100 px-1 rounded">,</code>
-                &mdash; Datas no formato <code class="font-mono text-xs bg-slate-100 px-1 rounded">DD/MM/AAAA</code>
+    <x-ui.card :glow="false" class="p-8">
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-main font-display tracking-tight">Importar Base de Dados</h3>
+            <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">
+                Separador: <span class="mono-text bg-white/40 dark:bg-white/5 border border-glass px-1 rounded mx-0.5">;</span> ou <span class="mono-text bg-white/40 dark:bg-white/5 border border-glass px-1 rounded mx-0.5">,</span>
+                &bull; Datas: <span class="mono-text bg-white/40 dark:bg-white/5 border border-glass px-1 rounded mx-0.5 ml-1">DD/MM/AAAA</span>
             </p>
         </div>
 
@@ -45,28 +40,25 @@
                     @dragover.prevent="dragging = true"
                     @dragleave.prevent="dragging = false"
                     @drop.prevent="dragging = false"
-                    :class="dragging ? 'border-primary-500 bg-primary-50' : 'border-slate-300 hover:border-primary-400'"
-                    class="border-2 border-dashed rounded-xl p-10 text-center transition-colors cursor-pointer"
+                    :class="dragging ? 'border-brand-500 bg-brand-500/5 ring-4 ring-brand-500/10' : 'border-glass hover:border-brand-500/40 hover:bg-white/30 dark:hover:bg-white/5'"
+                    class="border-2 border-dashed rounded-3xl p-16 text-center transition-all cursor-pointer group relative overflow-hidden"
                     onclick="document.getElementById('csv-input').click()"
                 >
                     <input id="csv-input" type="file" accept=".csv,.txt" class="hidden" wire:model="file">
-                    <div class="flex flex-col items-center gap-3">
-                        <div class="w-14 h-14 bg-primary-50 rounded-full flex items-center justify-center">
-                            <svg class="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
+                    
+                    <div class="relative z-10 flex flex-col items-center gap-6">
+                        <div class="size-20 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-white transition-all duration-500">
+                            <span class="material-symbols-outlined text-[40px]">upload_file</span>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-slate-700">Arraste ou Clique para enviar CSV</p>
-                            <p class="text-xs text-slate-400 mt-1">Tamanho maximo: 50 MB</p>
+                            <p class="text-base font-bold text-main tracking-tight group-hover:text-brand-500 transition-colors">Arraste ou Clique para enviar CSV</p>
+                            <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Limites: UTF-8 &bull; Máximo 50 MB</p>
                         </div>
                     </div>
-                    <div wire:loading wire:target="file" class="mt-4 flex items-center justify-center gap-2 text-primary-600">
-                        <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                        </svg>
-                        <span class="text-sm">Analisando arquivo...</span>
+
+                    <div wire:loading wire:target="file" class="absolute inset-0 z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md flex flex-col items-center justify-center gap-4 transition-all">
+                        <span class="material-symbols-outlined animate-spin text-brand-500 text-[32px]">progress_activity</span>
+                        <span class="text-xs font-bold text-main uppercase tracking-widest">Analisando estrutura do arquivo...</span>
                     </div>
                 </div>
             @endif
@@ -95,57 +87,50 @@
 
             {{-- Preview com validacao linha a linha --}}
             @if($mostrarPreview && count($preview) > 0)
-
                 {{-- Resumo de contagens --}}
-                <div class="mt-5 grid grid-cols-4 gap-3">
-                    <div class="bg-slate-50 rounded-lg px-4 py-3 text-center border border-slate-200">
-                        <p class="text-2xl font-bold font-mono text-slate-800">{{ number_format($total, 0, ',', '.') }}</p>
-                        <p class="text-xs text-slate-500 mt-0.5">Total de linhas</p>
-                    </div>
-                    <div class="bg-green-50 rounded-lg px-4 py-3 text-center border border-green-200">
-                        <p class="text-2xl font-bold font-mono text-green-700">{{ number_format($validos, 0, ',', '.') }}</p>
-                        <p class="text-xs text-green-600 mt-0.5">A importar</p>
-                    </div>
-                    <div class="rounded-lg px-4 py-3 text-center border {{ $duplicatas > 0 ? 'bg-amber-50 border-amber-300' : 'bg-slate-50 border-slate-200' }}">
-                        <p class="text-2xl font-bold font-mono {{ $duplicatas > 0 ? 'text-amber-700' : 'text-slate-400' }}">{{ number_format($duplicatas, 0, ',', '.') }}</p>
-                        <p class="text-xs {{ $duplicatas > 0 ? 'text-amber-600' : 'text-slate-400' }} mt-0.5">Duplicatas</p>
-                    </div>
-                    <div class="rounded-lg px-4 py-3 text-center border {{ $invalidos > 0 ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200' }}">
-                        <p class="text-2xl font-bold font-mono {{ $invalidos > 0 ? 'text-red-700' : 'text-slate-400' }}">{{ number_format($invalidos, 0, ',', '.') }}</p>
-                        <p class="text-xs {{ $invalidos > 0 ? 'text-red-600' : 'text-slate-400' }} mt-0.5">Com erro</p>
-                    </div>
+                <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <x-ui.card class="p-4" :glow="false">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-muted block mb-1">Total Linhas</span>
+                        <p class="text-2xl font-black font-display text-main mono-text">{{ number_format($total, 0, ',', '.') }}</p>
+                    </x-ui.card>
+                    <x-ui.card class="p-4 border-brand-500/30 bg-brand-500/5" :glow="false">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-brand-600 block mb-1">Válidos</span>
+                        <p class="text-2xl font-black font-display text-brand-500 mono-text">{{ number_format($validos, 0, ',', '.') }}</p>
+                    </x-ui.card>
+                    <x-ui.card class="p-4 {{ $duplicatas > 0 ? 'border-amber-500/30 bg-amber-500/5' : '' }}" :glow="false">
+                        <span class="text-[9px] font-black uppercase tracking-widest {{ $duplicatas > 0 ? 'text-amber-600' : 'text-muted' }} block mb-1">Duplicatas</span>
+                        <p class="text-2xl font-black font-display {{ $duplicatas > 0 ? 'text-amber-500' : 'text-main/40' }} mono-text">{{ number_format($duplicatas, 0, ',', '.') }}</p>
+                    </x-ui.card>
+                    <x-ui.card class="p-4 {{ $invalidos > 0 ? 'border-rose-500/30 bg-rose-500/5' : '' }}" :glow="false">
+                        <span class="text-[9px] font-black uppercase tracking-widest {{ $invalidos > 0 ? 'text-rose-600' : 'text-muted' }} block mb-1">Inválidos</span>
+                        <p class="text-2xl font-black font-display {{ $invalidos > 0 ? 'text-rose-500' : 'text-main/40' }} mono-text">{{ number_format($invalidos, 0, ',', '.') }}</p>
+                    </x-ui.card>
                 </div>
 
                 {{-- Painel de erros por linha (colapsavel) --}}
                 @if($invalidos > 0)
-                    <div class="mt-4">
+                    <div class="mt-6">
                         <button
-                            wire:click="$toggle('mostrarErros')"
-                            class="w-full flex items-center justify-between px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm hover:bg-red-100 transition-colors"
+                            @click="$wire.set('mostrarErros', !@js($mostrarErros))"
+                            class="w-full flex items-center justify-between px-6 py-4 bg-rose-500/5 border border-rose-500/20 rounded-2xl transition-all hover:bg-rose-500/10 group"
                         >
-                            <span class="font-medium text-red-700 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-                                </svg>
-                                {{ $invalidos }} {{ $invalidos === 1 ? 'linha com problema' : 'linhas com problema' }}
-                                — serao ignoradas na importacao
+                            <span class="text-[10px] font-black uppercase tracking-widest text-rose-600 flex items-center gap-3">
+                                <span class="material-symbols-outlined text-[18px]">warning</span>
+                                {{ $invalidos }} {{ $invalidos === 1 ? 'linha com problema' : 'linhas com problema' }} &bull; Serão ignoradas
                             </span>
-                            <svg class="w-4 h-4 text-red-500 transition-transform {{ $mostrarErros ? 'rotate-180' : '' }}"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
+                            <span class="material-symbols-outlined text-rose-500 transition-transform {{ $mostrarErros ? 'rotate-180' : '' }}">expand_more</span>
                         </button>
 
                         @if($mostrarErros)
-                            <div class="mt-1 border border-red-200 rounded-lg overflow-hidden divide-y divide-red-100 max-h-48 overflow-y-auto">
+                            <div class="mt-2 border border-glass rounded-2xl overflow-hidden divide-y divide-glass max-h-48 overflow-y-auto bg-white/40 dark:bg-white/5 backdrop-blur-md">
                                 @foreach($errosPorLinha as $erro)
-                                    <div class="px-4 py-2.5 bg-white flex items-start gap-3">
-                                        <span class="font-mono text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded flex-shrink-0 mt-0.5">
-                                            Linha {{ $erro['linha'] }}
+                                    <div class="px-6 py-3 flex items-start gap-4 hover:bg-white/30 dark:hover:bg-white/5 transition-colors">
+                                        <span class="font-mono text-[10px] bg-rose-500/10 text-rose-600 px-2 py-0.5 rounded-lg border border-rose-500/20 flex-shrink-0 mt-0.5 font-bold">
+                                            L{{ $erro['linha'] }}
                                         </span>
-                                        <ul class="text-xs text-red-600 space-y-0.5">
+                                        <ul class="text-[11px] font-bold text-secondary space-y-1">
                                             @foreach($erro['erros'] as $msg)
-                                                <li>&mdash; {{ $msg }}</li>
+                                                <li class="flex items-center gap-1.5"><span class="size-1 rounded-full bg-rose-500"></span> {{ $msg }}</li>
                                             @endforeach
                                         </ul>
                                     </div>
@@ -160,150 +145,118 @@
                     @php $totalDups = count($duplicatasPorLinha); $totalAprovadas = count($duplicatasAprovadas); @endphp
                     <div class="mt-4">
                         <button
-                            wire:click="$toggle('mostrarDuplicatas')"
-                            class="w-full flex items-center justify-between px-4 py-3 {{ $totalAprovadas === $totalDups ? 'bg-green-50 border-green-300' : 'bg-amber-50 border-amber-300' }} border rounded-lg text-sm hover:opacity-90 transition-colors"
+                            @click="$wire.set('mostrarDuplicatas', !@js($mostrarDuplicatas))"
+                            class="w-full flex items-center justify-between px-6 py-4 border rounded-2xl transition-all hover:bg-opacity-20 group
+                                {{ $totalAprovadas === $totalDups ? 'bg-brand-500/5 border-brand-500/20' : 'bg-amber-500/5 border-amber-500/20' }}"
                         >
-                            <span class="font-medium {{ $totalAprovadas === $totalDups ? 'text-green-800' : 'text-amber-800' }} flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                </svg>
+                            <span class="text-[10px] font-black uppercase tracking-widest flex items-center gap-3
+                                {{ $totalAprovadas === $totalDups ? 'text-brand-600' : 'text-amber-600' }}">
+                                <span class="material-symbols-outlined text-[18px]">find_replace</span>
                                 @if($totalAprovadas === $totalDups)
-                                    {{ $totalDups }} {{ $totalDups === 1 ? 'duplicata permitida' : 'duplicatas permitidas' }} — todas serao importadas
-                                @elseif($totalAprovadas > 0)
-                                    {{ $duplicatas }} {{ $duplicatas === 1 ? 'duplicata pendente' : 'duplicatas pendentes' }} &bull; {{ $totalAprovadas }} permitida(s)
+                                    {{ $totalDups }} Duplicatas Permitidas &bull; Serão importadas
                                 @else
-                                    {{ $duplicatas }} {{ $duplicatas === 1 ? 'registro ja existe' : 'registros ja existem' }} no banco
-                                    — serao ignorados para evitar cobran&ccedil;a dupla
+                                    {{ $duplicatas }} Registros Conflitantes &bull; {{ $totalAprovadas }} Permitidos
                                 @endif
                             </span>
-                            <svg class="w-4 h-4 {{ $totalAprovadas === $totalDups ? 'text-green-600' : 'text-amber-600' }} transition-transform {{ $mostrarDuplicatas ? 'rotate-180' : '' }}"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
+                            <span class="material-symbols-outlined transition-transform {{ $mostrarDuplicatas ? 'rotate-180' : '' }}
+                                {{ $totalAprovadas === $totalDups ? 'text-brand-500' : 'text-amber-500' }}">expand_more</span>
                         </button>
 
                         @if($mostrarDuplicatas)
-                            <div class="mt-1 border border-amber-200 rounded-lg overflow-hidden divide-y divide-amber-100 max-h-64 overflow-y-auto">
-                                <div class="px-4 py-2 bg-amber-50 border-b border-amber-200 flex items-center justify-between gap-3">
-                                    <p class="text-xs text-amber-700">
-                                        Marque os registros que deseja importar mesmo assim. Os desmarcados serao ignorados.
+                            <div class="mt-2 border border-glass rounded-2xl overflow-hidden bg-white/40 dark:bg-white/5 backdrop-blur-md">
+                                <div class="px-6 py-4 border-b border-glass flex items-center justify-between gap-4 bg-white/20 dark:bg-white/5">
+                                    <p class="text-[10px] font-bold text-muted uppercase tracking-tight">
+                                        Selecione os registros que deseja importar mesmo já existindo dados idênticos no banco.
                                     </p>
-                                    @if(count($duplicatasAprovadas) === count($duplicatasPorLinha))
-                                        <button
-                                            wire:click="desaprovarTodasDuplicatas"
-                                            class="text-xs text-amber-700 hover:text-amber-900 underline whitespace-nowrap flex-shrink-0"
-                                        >
-                                            Desmarcar todos
-                                        </button>
-                                    @else
-                                        <button
-                                            wire:click="aprovarTodasDuplicatas"
-                                            class="text-xs text-amber-700 hover:text-amber-900 underline whitespace-nowrap flex-shrink-0"
-                                        >
-                                            Selecionar todos
-                                        </button>
-                                    @endif
+                                    <button
+                                        wire:click="{{ count($duplicatasAprovadas) === count($duplicatasPorLinha) ? 'desaprovarTodasDuplicatas' : 'aprovarTodasDuplicatas' }}"
+                                        class="text-[10px] font-black uppercase tracking-widest text-brand-600 hover:text-brand-700 transition-colors whitespace-nowrap"
+                                    >
+                                        {{ count($duplicatasAprovadas) === count($duplicatasPorLinha) ? 'Desmarcar Tudo' : 'Marcar Tudo' }}
+                                    </button>
                                 </div>
-                                @foreach($duplicatasPorLinha as $dup)
-                                    @php $aprovado = in_array($dup['fingerprint'], $duplicatasAprovadas, true); @endphp
-                                    <div class="px-4 py-2.5 flex items-center gap-3 {{ $aprovado ? 'bg-green-50' : 'bg-white' }}">
-                                        <label class="flex items-center gap-2 cursor-pointer flex-shrink-0">
+                                <div class="max-h-64 overflow-y-auto divide-y divide-glass">
+                                    @foreach($duplicatasPorLinha as $dup)
+                                        @php $aprovado = in_array($dup['fingerprint'], $duplicatasAprovadas, true); @endphp
+                                        <div class="px-6 py-4 flex items-center gap-4 transition-colors {{ $aprovado ? 'bg-brand-500/5' : '' }} hover:bg-white/30 dark:hover:bg-white/10">
                                             <input
                                                 type="checkbox"
                                                 wire:click="toggleDuplicataAprovada('{{ $dup['fingerprint'] }}')"
                                                 @checked($aprovado)
-                                                class="w-4 h-4 rounded border-amber-400 text-green-600 cursor-pointer"
+                                                class="peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-glass bg-white/40 dark:bg-black/20 transition-all checked:border-brand-500 checked:bg-brand-500 focus:outline-none"
                                             >
-                                        </label>
-                                        <span class="font-mono text-xs {{ $aprovado ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700' }} px-2 py-0.5 rounded flex-shrink-0">
-                                            Linha {{ $dup['linha'] }}
-                                        </span>
-                                        <span class="text-xs {{ $aprovado ? 'text-green-800' : 'text-amber-800' }} flex-1 truncate">
-                                            <strong>{{ $dup['usuario'] }}</strong>
-                                            &mdash; {{ $dup['documento'] }}
-                                        </span>
-                                        <span class="text-xs {{ $aprovado ? 'text-green-600' : 'text-amber-600' }} font-mono flex-shrink-0">
-                                            {{ \Carbon\Carbon::parse($dup['data'])->format('d/m/Y H:i') }}
-                                            &bull; {{ $dup['paginas'] }} pag.
-                                        </span>
-                                        <span class="text-xs px-1.5 py-0.5 rounded {{ $aprovado ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800' }} flex-shrink-0">
-                                            {{ $aprovado ? 'permitida' : ($dup['origem'] === 'banco' ? 'no banco' : 'no arquivo') }}
-                                        </span>
-                                    </div>
-                                @endforeach
+                                            <div class="flex flex-col flex-1 min-w-0">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="font-mono text-[9px] font-black bg-white/60 dark:bg-white/10 text-main px-1.5 py-0.5 rounded border border-glass uppercase tracking-tighter">L{{ $dup['linha'] }}</span>
+                                                    <span class="text-xs font-bold text-main truncate">{{ $dup['usuario'] }}</span>
+                                                </div>
+                                                <span class="text-[10px] text-muted font-bold truncate mt-0.5">{{ $dup['documento'] }}</span>
+                                            </div>
+                                            <div class="flex flex-col items-end shrink-0 gap-1">
+                                                <span class="text-[10px] font-black text-main mono-text">{{ \Carbon\Carbon::parse($dup['data'])->format('d/m/Y H:i') }}</span>
+                                                <x-ui.badge :variant="$aprovado ? 'brand' : 'warning'" size="xs">
+                                                    {{ $aprovado ? 'Permitido' : ($dup['origem'] === 'banco' ? 'No Banco' : 'Repetido') }}
+                                                </x-ui.badge>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
                     </div>
                 @endif
 
                 {{-- Tabela de preview --}}
-                <div class="mt-5">
-                    <p class="text-xs font-medium text-slate-600 mb-2">
-                        Preview &mdash; primeiras {{ count($preview) }} linhas
-                        @if($total > 10)<span class="text-slate-400">(de {{ $total }})</span>@endif
+                <div class="mt-8">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-muted mb-3 ml-1">
+                        Preview dos Dados &bull; <span class="text-main">{{ count($preview) }} de {{ $total }} registros</span>
                     </p>
-                    <div class="overflow-x-auto rounded-lg border border-slate-200">
-                        <table class="w-full text-xs">
+                    <div class="overflow-x-auto rounded-2xl border border-glass bg-white/20 dark:bg-black/20">
+                        <table class="w-full">
                             <thead>
-                                <tr class="bg-slate-50 border-b border-slate-200">
-                                    <th class="px-2 py-2 text-center w-10 font-medium text-slate-500">#</th>
-                                    <th class="px-3 py-2 text-center w-16 font-medium text-slate-500">Status</th>
-                                    <th class="px-3 py-2 text-left font-medium text-slate-500">Usuario</th>
-                                    <th class="px-3 py-2 text-left font-medium text-slate-500">Documento</th>
-                                    <th class="px-3 py-2 text-left font-medium text-slate-500">Data</th>
-                                    <th class="px-3 py-2 text-right font-medium text-slate-500">Pag.</th>
-                                    <th class="px-3 py-2 text-right font-medium text-slate-500">Custo</th>
+                                <tr class="bg-white/40 dark:bg-white/5 border-b border-glass">
+                                    <th class="px-4 py-3 text-center w-12 text-[9px] font-black text-muted uppercase tracking-widest">#</th>
+                                    <th class="px-4 py-3 text-center w-20 text-[9px] font-black text-muted uppercase tracking-widest">Status</th>
+                                    <th class="px-4 py-3 text-left text-[9px] font-black text-muted uppercase tracking-widest">Usuário</th>
+                                    <th class="px-4 py-3 text-left text-[9px] font-black text-muted uppercase tracking-widest">Documento</th>
+                                    <th class="px-4 py-3 text-left text-[9px] font-black text-muted uppercase tracking-widest">Data / Hora</th>
+                                    <th class="px-4 py-3 text-right text-[9px] font-black text-muted uppercase tracking-widest">Pág.</th>
+                                    <th class="px-4 py-3 text-right text-[9px] font-black text-muted uppercase tracking-widest">Custo</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-glass">
                                 @foreach($preview as $row)
                                     @php
                                         $isDup = $row['_duplicata'] ?? false;
-                                        $trClass = ! $row['_valido'] ? 'bg-red-50 hover:bg-red-100'
-                                                 : ($isDup ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-slate-50');
+                                        $trClass = ! $row['_valido'] ? 'bg-rose-500/5 hover:bg-rose-500/10'
+                                                 : ($isDup ? 'bg-amber-500/5 hover:bg-amber-500/10' : 'hover:bg-white/30 dark:hover:bg-white/5');
                                     @endphp
-                                    <tr class="{{ $trClass }}">
-                                        <td class="px-2 py-2 text-center font-mono text-slate-400">{{ $row['_linha'] }}</td>
-                                        <td class="px-3 py-2 text-center">
+                                    <tr class="{{ $trClass }} transition-colors">
+                                        <td class="px-4 py-3 text-center font-mono text-[10px] text-muted">{{ $row['_linha'] }}</td>
+                                        <td class="px-4 py-3 text-center">
                                             @if(! $row['_valido'])
-                                                <span title="{{ implode(' | ', $row['_erros']) }}"
-                                                      class="inline-flex items-center gap-1 text-red-600 font-medium cursor-help">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                    Erro
-                                                </span>
+                                                <x-ui.badge variant="destructive" size="xs" title="{{ implode(' | ', $row['_erros']) }}">Erro</x-ui.badge>
                                             @elseif($isDup)
-                                                <span class="inline-flex items-center gap-1 text-amber-700 font-medium">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                                                    </svg>
-                                                    Dup.
-                                                </span>
+                                                <x-ui.badge variant="warning" size="xs">Dup.</x-ui.badge>
                                             @else
-                                                <span class="inline-flex items-center gap-1 text-green-700 font-medium">
-                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                                                    </svg>
-                                                    OK
-                                                </span>
+                                                <x-ui.badge variant="success" size="xs">OK</x-ui.badge>
                                             @endif
                                         </td>
-                                        <td class="px-3 py-2 {{ ! $row['_valido'] ? 'text-red-900' : ($isDup ? 'text-amber-800' : 'text-slate-700') }}">
+                                        <td class="px-4 py-3 text-xs font-bold {{ ! $row['_valido'] ? 'text-rose-500' : 'text-main' }}">
                                             {{ $row['usuario'] ?: '—' }}
                                         </td>
-                                        <td class="px-3 py-2 max-w-[180px] {{ ! $row['_valido'] ? 'text-red-900' : ($isDup ? 'text-amber-800' : 'text-slate-700') }}">
-                                            <span class="truncate block" title="{{ $row['documento'] }}">
+                                        <td class="px-4 py-3 max-w-[200px]">
+                                            <span class="text-[11px] font-bold text-secondary truncate block" title="{{ $row['documento'] }}">
                                                 {{ $row['documento'] ?: '—' }}
                                             </span>
                                         </td>
-                                        <td class="px-3 py-2 font-mono {{ ! $row['_valido'] ? 'text-red-700' : ($isDup ? 'text-amber-700' : 'text-slate-500') }}">
+                                        <td class="px-4 py-3 font-mono text-[10px] text-main">
                                             {{ $row['data_impressao'] }}
                                         </td>
-                                        <td class="px-3 py-2 text-right font-mono {{ ! $row['_valido'] ? 'text-red-700' : ($isDup ? 'text-amber-700' : 'text-slate-700') }}">
+                                        <td class="px-4 py-3 text-right font-black mono-text text-main text-[11px]">
                                             {{ $row['paginas'] }}
                                         </td>
-                                        <td class="px-3 py-2 text-right font-mono {{ ! $row['_valido'] ? 'text-red-700' : ($isDup ? 'text-amber-700' : 'text-slate-700') }}">
+                                        <td class="px-4 py-3 text-right font-black mono-text text-main text-[11px]">
                                             R$ {{ number_format($row['custo'], 2, ',', '.') }}
                                         </td>
                                     </tr>
@@ -311,86 +264,67 @@
                             </tbody>
                         </table>
                     </div>
-                    @if($invalidos > 0)
-                        <p class="text-xs text-slate-400 mt-2 italic">
-                            Passe o mouse sobre "Erro" para ver o detalhe de cada linha.
-                        </p>
-                    @endif
                 </div>
 
                 {{-- Acoes --}}
-                <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-                    <button
-                        wire:click="cancelar"
-                        class="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
-                    >
+                <div class="mt-10 flex items-center justify-between border-t border-glass pt-8">
+                    <x-ui.button variant="ghost" wire:click="cancelar">
                         Cancelar
-                    </button>
-                    <button
-                        wire:click="importar"
-                        @if($validos === 0) disabled @endif
-                        class="px-6 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2
-                            {{ $validos > 0
-                                ? 'bg-primary-900 text-white hover:bg-primary-800'
-                                : 'bg-slate-200 text-slate-400 cursor-not-allowed' }}"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                        </svg>
-                        Importar {{ $validos }} registro(s) valido(s)
-                    </button>
+                    </x-ui.button>
+                    <x-ui.button variant="primary" icon="publish" wire:click="importar" :disabled="$validos === 0" class="px-12">
+                        Importar {{ $validos }} registros válidos
+                    </x-ui.button>
                 </div>
             @endif
         @endif
 
         {{-- Estado: Importando --}}
         @if($status === 'importing')
-            <div class="flex flex-col items-center py-10 gap-4">
-                <svg class="animate-spin w-10 h-10 text-primary-600" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <p class="text-sm font-medium text-slate-700">Importando registros...</p>
-                <p class="text-xs text-slate-500">Classificando e salvando no banco de dados.</p>
+            <div class="flex flex-col items-center py-20 gap-6">
+                <span class="material-symbols-outlined animate-spin text-brand-500 text-[48px]">progress_activity</span>
+                <div class="text-center">
+                    <p class="text-lg font-bold text-main tracking-tight font-display">Processando Importação</p>
+                    <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Classificando e indexando registros no banco de dados</p>
+                </div>
             </div>
         @endif
 
         {{-- Estado: Sucesso --}}
         @if($status === 'success')
-            <div class="flex flex-col items-center py-10 gap-4">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                    </svg>
+            <div class="flex flex-col items-center py-16 gap-8">
+                <div class="size-24 rounded-full bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-500 relative">
+                    <div class="absolute inset-0 rounded-full animate-ping bg-brand-500/10"></div>
+                    <span class="material-symbols-outlined text-[48px] relative z-10">check_circle</span>
                 </div>
-                <div class="text-center">
-                    <p class="text-base font-semibold text-slate-800">Importacao concluida!</p>
-                    <p class="text-sm text-slate-500 mt-1">
-                        <span class="font-mono font-bold text-primary-900">{{ $importados }}</span>
-                        registro(s) novos importados com classificacao automatica.
+                <div class="text-center max-w-sm">
+                    <p class="text-2xl font-black text-main tracking-tight font-display">Importação Concluída!</p>
+                    <p class="text-xs font-bold text-secondary mt-3 leading-relaxed">
+                        Foram importados <span class="text-brand-500 mono-text text-base font-black">{{ $importados }}</span> novos registros com classificação inteligente.
                     </p>
-                    @if($duplicatas > 0)
-                        <p class="text-xs text-amber-600 mt-1">
-                            {{ $duplicatas }} registro(s) ja existentes no banco foram ignorados — nenhuma cobranca duplicada sera gerada.
-                        </p>
-                    @endif
-                    @if($ignorados > 0)
-                        <p class="text-xs text-red-500 mt-1">{{ $ignorados }} linha(s) com formato invalido foram ignoradas.</p>
-                    @endif
+                    <div class="flex flex-col gap-2 mt-6">
+                        @if($duplicatas > 0)
+                            <div class="flex items-center gap-2 justify-center text-[10px] font-bold text-amber-600 uppercase tracking-tight bg-amber-500/5 px-3 py-1.5 rounded-xl border border-amber-500/10">
+                                <span class="material-symbols-outlined text-[14px]">info</span>
+                                {{ $duplicatas }} Duplicatas ignoradas com segurança
+                            </div>
+                        @endif
+                        @if($ignorados > 0)
+                            <div class="flex items-center gap-2 justify-center text-[10px] font-bold text-rose-600 uppercase tracking-tight bg-rose-500/5 px-3 py-1.5 rounded-xl border border-rose-500/10">
+                                <span class="material-symbols-outlined text-[14px]">error</span>
+                                {{ $ignorados }} Linhas inválidas foram descartadas
+                            </div>
+                        @endif
+                    </div>
                 </div>
-                <div class="flex items-center gap-3 mt-2">
-                    <button
-                        wire:click="cancelar"
-                        class="px-4 py-2 text-sm border border-slate-300 text-slate-600 rounded-lg hover:bg-slate-50 transition-colors"
-                    >
-                        Importar outro arquivo
-                    </button>
-                    <a href="{{ route('dashboard') }}"
-                       class="px-4 py-2 bg-primary-900 text-white text-sm font-medium rounded-lg hover:bg-primary-800 transition-colors">
+                <div class="flex items-center gap-4 mt-4">
+                    <x-ui.button variant="secondary" wire:click="cancelar">
+                        Nova Importação
+                    </x-ui.button>
+                    <x-ui.button variant="primary" icon="dashboard" href="{{ route('dashboard') }}">
                         Ver Dashboard
-                    </a>
+                    </x-ui.button>
                 </div>
             </div>
         @endif
-    </div>
+    </x-ui.card>
 </div>

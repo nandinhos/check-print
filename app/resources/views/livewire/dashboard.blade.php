@@ -1,277 +1,193 @@
-<div class="space-y-6">
+<div class="space-y-8">
 
     {{-- Modal de edicao de classificacao --}}
-    @if($modalAberto)
-    <div class="fixed inset-0 z-50 flex items-center justify-center">
-        {{-- Backdrop --}}
-        <div
-            class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
-            wire:click="fecharModal"
-        ></div>
-
-        {{-- Painel do modal --}}
-        <div class="relative bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-md mx-4 p-6">
-
+    <x-ui.modal name="edit-classification" :show="$modalAberto" max-width="md" focusable>
+        <div class="p-8">
             {{-- Header --}}
-            <div class="flex items-start justify-between mb-5">
+            <div class="flex items-start justify-between mb-6">
                 <div>
-                    <h2 class="text-base font-semibold text-slate-800">Alterar Classificacao</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Escolha a classificacao correta para este registro</p>
+                    <h2 class="text-xl font-bold font-display text-main tracking-tight">Alterar Classificação</h2>
+                    <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-1">Escolha a categoria correta para este registro</p>
                 </div>
-                <button wire:click="fecharModal" class="text-slate-400 hover:text-slate-600 transition-colors p-1 -mr-1 -mt-1">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
+                <button @click="show = false" wire:click="fecharModal" class="text-muted hover:text-main transition-colors p-1 -mr-1 -mt-1">
+                    <span class="material-symbols-outlined text-[20px]">close</span>
                 </button>
             </div>
 
             {{-- Informacoes do registro --}}
-            <div class="bg-slate-50 rounded-xl p-4 mb-5 space-y-1.5">
-                <div class="flex gap-2">
-                    <span class="text-xs font-medium text-slate-400 w-20 shrink-0">Usuario</span>
-                    <span class="text-xs font-medium text-slate-700">{{ $modalUsuario }}</span>
+            <div class="bg-white/40 dark:bg-white/5 border border-glass rounded-2xl p-5 mb-6 space-y-3 backdrop-blur-md shadow-sm">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-muted uppercase tracking-wider">Usuário</span>
+                    <span class="text-sm font-bold text-main">{{ $modalUsuario }}</span>
                 </div>
-                <div class="flex gap-2">
-                    <span class="text-xs font-medium text-slate-400 w-20 shrink-0">Documento</span>
-                    <span class="text-xs text-slate-600 leading-tight">{{ $modalDocumento }}</span>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-muted uppercase tracking-wider">Documento</span>
+                    <span class="text-xs text-secondary leading-relaxed font-mono line-clamp-2">{{ $modalDocumento }}</span>
                 </div>
-                <div class="flex gap-2 pt-1">
-                    <span class="text-xs font-medium text-slate-400 w-20 shrink-0">Atual</span>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                        {{ $modalClassificacaoAtual === 'PESSOAL'
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-violet-100 text-violet-800' }}">
-                        {{ $modalClassificacaoAtual }}
-                    </span>
+                <div class="flex flex-col gap-1 pt-1">
+                    <span class="text-[10px] font-bold text-muted uppercase tracking-wider">Classificação Atual</span>
+                    <div>
+                        <x-ui.badge :variant="$modalClassificacaoAtual === 'PESSOAL' ? 'warning' : 'brand'" :pulse="true">
+                            {{ $modalClassificacaoAtual }}
+                        </x-ui.badge>
+                    </div>
                 </div>
             </div>
 
             {{-- Botoes de selecao --}}
-            <p class="text-xs font-medium text-slate-500 mb-3">Selecione a nova classificacao:</p>
-            <div class="grid grid-cols-2 gap-3 mb-4">
+            <p class="text-[10px] font-bold text-muted uppercase tracking-widest mb-4 ml-1">Selecione a nova classificação:</p>
+            <div class="grid grid-cols-1 gap-3 mb-8">
                 <button
                     wire:click="salvarClassificacao('PESSOAL')"
-                    class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all
+                    class="group flex items-center gap-4 p-4 rounded-2xl border transition-all text-left
                         {{ $modalClassificacaoAtual === 'PESSOAL'
-                            ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-200'
-                            : 'border-slate-200 hover:border-amber-300 hover:bg-amber-50' }}"
+                            ? 'bg-brand-500/10 border-brand-500/40 ring-4 ring-brand-500/5 shadow-lg'
+                            : 'bg-white/20 dark:bg-white/5 border-glass border hover:bg-white/40 dark:hover:bg-white/10 hover:border-brand-500/30' }}"
                 >
-                    <span class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
-                    </span>
-                    <span class="text-sm font-semibold text-amber-800">PESSOAL</span>
-                    <span class="text-xs text-amber-600 text-center leading-tight">Documento pessoal do funcionario</span>
+                    <div class="size-12 rounded-xl {{ $modalClassificacaoAtual === 'PESSOAL' ? 'bg-brand-500 text-white' : 'bg-brand-500/10 text-brand-500' }} flex items-center justify-center shrink-0 transition-colors">
+                        <span class="material-symbols-outlined text-[24px]">person</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-bold text-main tracking-tight">PESSOAL</span>
+                        <span class="block text-[10px] text-muted leading-tight mt-0.5">Documentos privados de uso estritamente pessoal</span>
+                    </div>
+                    @if($modalClassificacaoAtual === 'PESSOAL')
+                        <span class="material-symbols-outlined ml-auto text-brand-500">check_circle</span>
+                    @endif
                 </button>
 
                 <button
                     wire:click="salvarClassificacao('ADMINISTRATIVO')"
-                    class="flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all
+                    class="group flex items-center gap-4 p-4 rounded-2xl border transition-all text-left
                         {{ $modalClassificacaoAtual === 'ADMINISTRATIVO'
-                            ? 'border-violet-400 bg-violet-50 ring-2 ring-violet-200'
-                            : 'border-slate-200 hover:border-violet-300 hover:bg-violet-50' }}"
+                            ? 'bg-brand-500/10 border-brand-500/40 ring-4 ring-brand-500/5 shadow-lg'
+                            : 'bg-white/20 dark:bg-white/5 border-glass border hover:bg-white/40 dark:hover:bg-white/10 hover:border-brand-500/30' }}"
                 >
-                    <span class="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
-                        <span class="w-3 h-3 rounded-full bg-violet-400"></span>
-                    </span>
-                    <span class="text-sm font-semibold text-violet-800">ADMINISTRATIVO</span>
-                    <span class="text-xs text-violet-600 text-center leading-tight">Documento de uso corporativo</span>
+                    <div class="size-12 rounded-xl {{ $modalClassificacaoAtual === 'ADMINISTRATIVO' ? 'bg-brand-500 text-white' : 'bg-brand-500/10 text-brand-500' }} flex items-center justify-center shrink-0 transition-colors">
+                        <span class="material-symbols-outlined text-[24px]">business_center</span>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-bold text-main tracking-tight">ADMINISTRATIVO</span>
+                        <span class="block text-[10px] text-muted leading-tight mt-0.5">Documentos corporativos e operacionais</span>
+                    </div>
+                    @if($modalClassificacaoAtual === 'ADMINISTRATIVO')
+                        <span class="material-symbols-outlined ml-auto text-brand-500">check_circle</span>
+                    @endif
                 </button>
             </div>
 
-            {{-- Botao cancelar --}}
-            <button
-                wire:click="fecharModal"
-                class="w-full py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
-            >
-                Cancelar — manter como esta
-            </button>
+            {{-- Footer Acoes --}}
+            <div class="flex gap-3">
+                <x-ui.button variant="ghost" class="flex-1" @click="show = false" wire:click="fecharModal">
+                    Cancelar
+                </x-ui.button>
+            </div>
         </div>
-    </div>
-    @endif
+    </x-ui.modal>
 
     {{-- KPI Cards --}}
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4 xl:grid-cols-5">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+        <x-ui.statistic label="Total Impressões" :value="number_format($totalImpressoes, 0, ',', '.')" :trend="number_format($totalPaginas, 0, ',', '.') . ' Pág.'" trend-color="slate" />
+        <x-ui.statistic label="Custo Total" :value="'R$ ' . number_format($custoTotal, 2, ',', '.')" trend="Período" trend-color="brand" />
+        <x-ui.statistic label="Custo Pessoal" :value="'R$ ' . number_format($custoPessoal, 2, ',', '.')" :trend="$percentualPessoal . '%'" trend-color="amber" />
+        <x-ui.statistic label="Custo Administrativo" :value="'R$ ' . number_format($custoAdministrativo, 2, ',', '.')" :trend="(100 - $percentualPessoal) . '%'" trend-color="brand" />
 
-        {{-- Total de Impressoes --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Total Impressoes</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1 font-mono">{{ number_format($totalImpressoes, 0, ',', '.') }}</p>
-            <p class="text-xs text-slate-400 mt-1">{{ number_format($totalPaginas, 0, ',', '.') }} paginas</p>
-        </div>
-
-        {{-- Custo Total --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">Custo Total</p>
-            <p class="text-2xl font-bold text-slate-800 mt-1 font-mono">R$ {{ number_format($custoTotal, 2, ',', '.') }}</p>
-            <p class="text-xs text-slate-400 mt-1">no periodo selecionado</p>
-        </div>
-
-        {{-- Custo Pessoal - destaque --}}
-        <div class="bg-amber-50 rounded-xl shadow-sm border border-amber-200 p-5">
-            <p class="text-xs font-medium text-amber-700 uppercase tracking-wide">Custo Pessoal</p>
-            <p class="text-2xl font-bold text-amber-800 mt-1 font-mono">R$ {{ number_format($custoPessoal, 2, ',', '.') }}</p>
-            <p class="text-xs text-amber-600 mt-1">{{ $percentualPessoal }}% do total</p>
-        </div>
-
-        {{-- Custo Administrativo --}}
-        <div class="bg-violet-50 rounded-xl shadow-sm border border-violet-200 p-5">
-            <p class="text-xs font-medium text-violet-700 uppercase tracking-wide">Administrativo</p>
-            <p class="text-2xl font-bold text-violet-800 mt-1 font-mono">R$ {{ number_format($custoAdministrativo, 2, ',', '.') }}</p>
-            <p class="text-xs text-violet-600 mt-1">{{ 100 - $percentualPessoal }}% do total</p>
-        </div>
-
-        {{-- Percentual visual --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 lg:col-span-2 xl:col-span-1">
-            <p class="text-xs font-medium text-slate-500 uppercase tracking-wide">% Pessoal</p>
-            <p class="text-2xl font-bold mt-1 font-mono {{ $percentualPessoal > 20 ? 'text-amber-700' : 'text-slate-800' }}">
-                {{ $percentualPessoal }}%
-            </p>
-            <div class="mt-2 h-2 bg-slate-100 rounded-full overflow-hidden">
+        {{-- Percentual visual Card --}}
+        <x-ui.card class="p-4" :glow="true" style="--glow-color: rgba(245,158,11,0.15)">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-muted uppercase tracking-widest">% Pessoais</span>
+                <span class="text-lg font-black font-display {{ $percentualPessoal > 20 ? 'text-amber-500' : 'text-main' }}">
+                    {{ $percentualPessoal }}%
+                </span>
+            </div>
+            <div class="h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                 <div
-                    class="h-full bg-amber-400 rounded-full transition-all duration-500"
+                    class="h-full bg-amber-500 rounded-full transition-all duration-1000 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
                     style="width: {{ min($percentualPessoal, 100) }}%"
                 ></div>
             </div>
-        </div>
+            <p class="text-[9px] text-muted mt-2 font-bold uppercase tracking-tighter">Budget Alvo: < 15%</p>
+        </x-ui.card>
     </div>
 
     {{-- Filtros --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <x-ui.card :glow="false" class="p-6">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 items-end">
+            <x-ui.input label="Data Início" type="date" wire:model.live="dataInicio" />
+            <x-ui.input label="Data Fim" type="date" wire:model.live="dataFim" />
 
-            {{-- Date Range --}}
-            <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1.5">Data Inicio</label>
-                <input
-                    type="date"
-                    wire:model.live="dataInicio"
-                    class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
+            <div class="flex flex-col gap-1.5 group">
+                <label class="block text-xs font-bold text-muted uppercase tracking-wider ml-1">Tipo</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted text-[20px] transition-colors group-focus-within:text-brand-500">filter_alt</span>
+                    <select wire:model.live="filtroTipo" class="w-full bg-white/40 dark:bg-zinc-900/40 border border-glass backdrop-blur-md rounded-2xl text-xs font-bold uppercase py-3 pl-12 pr-4 text-main focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500/50 focus:bg-white dark:focus:bg-zinc-900 transition-all appearance-none">
+                        <option value="todos">Todos os Tipos</option>
+                        <option value="PESSOAL">Pessoais</option>
+                        <option value="ADMINISTRATIVO">Administrativos</option>
+                    </select>
+                </div>
             </div>
 
-            <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1.5">Data Fim</label>
-                <input
-                    type="date"
-                    wire:model.live="dataFim"
-                    class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
+            <div class="flex flex-col gap-1.5 group">
+                <label class="block text-xs font-bold text-muted uppercase tracking-wider ml-1">Usuário</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted text-[20px] transition-colors group-focus-within:text-brand-500">person</span>
+                    <select wire:model.live="filtroUsuario" class="w-full bg-white/40 dark:bg-zinc-900/40 border border-glass backdrop-blur-md rounded-2xl text-xs font-bold uppercase py-3 pl-12 pr-4 text-main focus:ring-4 focus:ring-brand-500/10 focus:border-brand-500/50 focus:bg-white dark:focus:bg-zinc-900 transition-all appearance-none">
+                        <option value="">Todos os Usuários</option>
+                        @foreach($usuarios as $usuario)
+                            <option value="{{ $usuario }}">{{ $usuario }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
-            {{-- Tipo Toggle --}}
-            <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1.5">Tipo</label>
-                <select
-                    wire:model.live="filtroTipo"
-                    class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                    <option value="todos">Todos</option>
-                    <option value="PESSOAL">Apenas Pessoais</option>
-                    <option value="ADMINISTRATIVO">Apenas Administrativos</option>
-                </select>
-            </div>
-
-            {{-- Select de usuario --}}
-            <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1.5">Filtrar por Usuario</label>
-                <select
-                    wire:model.live="filtroUsuario"
-                    class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                    <option value="">Todos os usuarios</option>
-                    @foreach($usuarios as $usuario)
-                        <option value="{{ $usuario }}">{{ $usuario }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- Busca por documento --}}
-            <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1.5">Buscar por Documento</label>
-                <input
-                    type="text"
-                    wire:model.live.debounce.300ms="buscaDocumento"
-                    placeholder="Nome do documento..."
-                    class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-            </div>
-
-            {{-- Botoes de exportacao --}}
-            <div class="flex items-end gap-2 lg:col-span-3 justify-end">
-                <a
-                    href="{{ route('export.excel') }}?data_inicio={{ $dataInicio }}&data_fim={{ $dataFim }}&usuario={{ $filtroUsuario }}&tipo={{ $filtroTipo }}&documento={{ $buscaDocumento }}"
-                    class="flex items-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs rounded-lg transition-colors"
-                >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                    </svg>
+            <div class="flex gap-2">
+                <x-ui.button variant="success" class="flex-1" icon="table_view" href="{{ route('export.excel') }}?data_inicio={{ $dataInicio }}&data_fim={{ $dataFim }}&usuario={{ $filtroUsuario }}&tipo={{ $filtroTipo }}&documento={{ $buscaDocumento }}">
                     Excel
-                </a>
-                <a
-                    href="{{ route('export.pdf') }}?data_inicio={{ $dataInicio }}&data_fim={{ $dataFim }}&usuario={{ $filtroUsuario }}&tipo={{ $filtroTipo }}"
-                    class="flex items-center gap-1.5 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-xs rounded-lg transition-colors"
-                >
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-                    </svg>
+                </x-ui.button>
+                <x-ui.button variant="danger" class="flex-1" icon="picture_as_pdf" href="{{ route('export.pdf') }}?data_inicio={{ $dataInicio }}&data_fim={{ $dataFim }}&usuario={{ $filtroUsuario }}&tipo={{ $filtroTipo }}">
                     PDF
-                </a>
+                </x-ui.button>
             </div>
         </div>
-    </div>
+    </x-ui.card>
 
     {{-- Tabela Principal --}}
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-
+    <x-ui.card :glow="false" class="overflow-hidden">
         {{-- Header da tabela --}}
-        <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <h3 class="text-sm font-semibold text-slate-700">
-                    Registros de Impressao
-                    <span class="ml-2 text-xs font-normal text-slate-400">{{ $logs->total() }} registros</span>
-                </h3>
+        <div class="px-8 py-5 border-b border-glass flex items-center justify-between bg-white/40 dark:bg-white/5 backdrop-blur-md">
+            <div class="flex items-center gap-4">
+                <div class="flex flex-col">
+                    <h3 class="text-sm font-bold text-main font-display tracking-tight">Registros de Impressão</h3>
+                    <p class="text-[10px] font-bold text-muted uppercase tracking-widest mt-0.5">{{ $logs->total() }} registros encontrados</p>
+                </div>
+
                 @if(count($selecionados) > 0)
-                    <span class="text-xs bg-primary-100 text-primary-800 px-2 py-0.5 rounded-full font-medium">
-                        {{ count($selecionados) }} selecionado(s)
-                    </span>
+                    <x-ui.badge variant="brand" :pulse="true">
+                        {{ count($selecionados) }} selecionados
+                    </x-ui.badge>
                 @endif
             </div>
-            <div class="flex items-center gap-2">
-                {{-- Barra de acao em massa --}}
+
+            <div class="flex items-center gap-3">
                 @if(count($selecionados) > 0)
-                    <div class="flex items-center gap-2 border border-slate-200 rounded-lg px-3 py-1.5 bg-slate-50">
-                        <span class="text-xs text-slate-500">Classificar como:</span>
-                        <button
-                            wire:click="salvarClassificacaoEmMassa({{ json_encode($selecionados) }}, 'PESSOAL')"
-                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors"
-                        >
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                            PESSOAL
-                        </button>
-                        <button
-                            wire:click="salvarClassificacaoEmMassa({{ json_encode($selecionados) }}, 'ADMINISTRATIVO')"
-                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-800 hover:bg-violet-200 transition-colors"
-                        >
-                            <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
-                            ADMINISTRATIVO
-                        </button>
-                        <button
-                            wire:click="$set('selecionados', [])"
-                            class="text-xs text-slate-400 hover:text-slate-600 ml-1"
-                            title="Limpar selecao"
-                        >
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
+                    <div class="flex items-center gap-2 pr-4 border-r border-glass">
+                        <span class="text-[9px] font-black uppercase tracking-widest text-muted">Ações:</span>
+                        <x-ui.button variant="primary" size="xs" icon="person" wire:click="salvarClassificacaoEmMassa({{ json_encode($selecionados) }}, 'PESSOAL')">
+                            Pessoal
+                        </x-ui.button>
+                        <x-ui.button variant="primary" size="xs" icon="business_center" wire:click="salvarClassificacaoEmMassa({{ json_encode($selecionados) }}, 'ADMINISTRATIVO')">
+                            Adm
+                        </x-ui.button>
+                        <button wire:click="$set('selecionados', [])" class="p-1.5 text-muted hover:text-rose-500 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
                         </button>
                     </div>
                 @endif
-                <div wire:loading class="text-xs text-slate-400 flex items-center gap-1.5">
-                    <svg class="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                    </svg>
-                    Atualizando...
+
+                <div wire:loading class="flex items-center gap-2">
+                    <span class="material-symbols-outlined animate-spin text-brand-500 text-[18px]">progress_activity</span>
+                    <span class="text-[10px] font-bold text-muted uppercase tracking-widest">Sincronizando...</span>
                 </div>
             </div>
         </div>
@@ -295,75 +211,86 @@
                 <table class="w-full">
                     @php $idsNaPagina = $logs->pluck('id')->toArray(); @endphp
                     <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200">
-                            <th class="px-4 py-3 w-10">
+                        <tr class="bg-white/40 dark:bg-white/5 border-b border-glass">
+                            <th class="px-6 py-4 w-10">
                                 <input
                                     type="checkbox"
-                                    wire:click="toggleTodos({{ json_encode($idsNaPagina) }})"
-                                    @checked($todosSelecionados)
-                                    class="w-4 h-4 rounded border-slate-300 text-primary-600 cursor-pointer"
-                                    title="Selecionar todos desta pagina"
+                                    x-data="{ checkAll: false }"
+                                    @click="checkAll = !checkAll; $wire.toggleTodos({{ json_encode($idsNaPagina) }})"
+                                    :checked="checkAll"
+                                    class="peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-glass bg-white/40 dark:bg-black/20 transition-all checked:border-brand-500 checked:bg-brand-500 focus:outline-none"
                                 >
                             </th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Data</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Usuario</th>
-                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">Documento</th>
-                            <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wide">Pag.</th>
-                            <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wide">Custo</th>
-                            <th class="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wide">Classificacao</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold text-muted uppercase tracking-widest">Data / Hora</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold text-muted uppercase tracking-widest">Usuário</th>
+                            <th class="px-6 py-4 text-left text-[10px] font-bold text-muted uppercase tracking-widest">Documento</th>
+                            <th class="px-6 py-4 text-center text-[10px] font-bold text-muted uppercase tracking-widest">Pág.</th>
+                            <th class="px-6 py-4 text-right text-[10px] font-bold text-muted uppercase tracking-widest">Custo</th>
+                            <th class="px-6 py-4 text-center text-[10px] font-bold text-muted uppercase tracking-widest">Classificação</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-glass">
                         @foreach($logs as $log)
                             @php $selecionado = in_array($log->id, $selecionados); @endphp
-                            <tr class="{{ $selecionado ? 'bg-primary-50' : 'hover:bg-slate-50' }} transition-colors group">
-                                <td class="px-4 py-3">
+                            <tr class="{{ $selecionado ? 'bg-brand-500/5' : 'hover:bg-white/30 dark:hover:bg-white/5' }} transition-colors group">
+                                <td class="px-6 py-4">
                                     <input
                                         type="checkbox"
                                         wire:model.live="selecionados"
                                         value="{{ $log->id }}"
-                                        class="w-4 h-4 rounded border-slate-300 text-primary-600 cursor-pointer"
+                                        class="peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-glass bg-white/40 dark:bg-black/20 transition-all checked:border-brand-500 checked:bg-brand-500 focus:outline-none"
                                     >
                                 </td>
-                                <td class="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">
-                                    {{ $log->data_impressao->format('d/m/Y') }}
-                                    <span class="text-slate-400">{{ $log->data_impressao->format('H:i') }}</span>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-main mono-text">{{ $log->data_impressao->format('d/m/Y') }}</span>
+                                        <span class="text-[10px] text-muted font-bold uppercase tracking-tight">{{ $log->data_impressao->format('H:i') }} h</span>
+                                    </div>
                                 </td>
-                                <td class="px-4 py-3 text-sm font-medium text-slate-700">{{ $log->usuario }}</td>
-                                <td class="px-4 py-3 text-sm text-slate-600 max-w-xs">
-                                    <span class="truncate block" title="{{ $log->documento }}">{{ $log->documento }}</span>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <div class="size-7 rounded-full bg-brand-500/10 flex items-center justify-center border border-brand-500/20 text-brand-600 font-bold text-[10px]">
+                                            {{ substr($log->usuario, 0, 1) }}
+                                        </div>
+                                        <span class="text-xs font-bold text-main">{{ $log->usuario }}</span>
+                                    </div>
                                 </td>
-                                <td class="px-4 py-3 text-xs text-slate-600 text-center font-mono">{{ $log->paginas }}</td>
-                                <td class="px-4 py-3 text-sm font-mono text-slate-700 text-right">
-                                    R$ {{ number_format($log->custo, 2, ',', '.') }}
+                                <td class="px-6 py-4 max-w-xs">
+                                    <span class="text-xs text-secondary line-clamp-1 hover:line-clamp-none transition-all leading-tight" title="{{ $log->documento }}">
+                                        {{ $log->documento }}
+                                    </span>
                                 </td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="inline-flex items-center gap-1">
+                                <td class="px-6 py-4 text-center">
+                                    <span class="text-[11px] font-black mono-text bg-white/40 dark:bg-white/10 px-2 py-0.5 rounded-lg border border-glass">
+                                        {{ $log->paginas }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="text-xs font-black mono-text text-main">
+                                        R$ {{ number_format($log->custo, 2, ',', '.') }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="inline-flex items-center gap-2">
                                         <button
                                             wire:click="abrirModalEdicao({{ $log->id }})"
-                                            title="{{ $log->isManual() ? 'Editado manualmente — clique para alterar' : 'Clique para alterar classificacao' }}"
-                                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:scale-105
-                                                {{ $log->classificacao === 'PESSOAL'
-                                                    ? 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-                                                    : 'bg-violet-100 text-violet-800 hover:bg-violet-200' }}"
+                                            class="transition-transform hover:scale-105 active:scale-95"
                                         >
-                                            {{ $log->classificacao }}
-                                            @if($log->isManual())
-                                                <span
-                                                    title="Classificacao difere da sugerida automaticamente"
-                                                    class="w-1.5 h-1.5 bg-current rounded-full opacity-70"
-                                                ></span>
-                                            @endif
+                                            <x-ui.badge
+                                                :variant="$log->classificacao === 'PESSOAL' ? 'warning' : 'primary'"
+                                                :pulse="$log->isManual()"
+                                            >
+                                                {{ $log->classificacao }}
+                                            </x-ui.badge>
                                         </button>
+
                                         @if($log->isManual())
                                             <button
                                                 wire:click="reverterClassificacao({{ $log->id }})"
-                                                title="Reverter para classificacao original: {{ $log->classificacao_auto }}"
-                                                class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400 hover:text-slate-600 p-0.5"
+                                                title="Reverter para: {{ $log->classificacao_auto }}"
+                                                class="opacity-0 group-hover:opacity-100 transition-opacity text-muted hover:text-brand-500 p-1"
                                             >
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
-                                                </svg>
+                                                <span class="material-symbols-outlined text-[16px]">history</span>
                                             </button>
                                         @endif
                                     </div>
@@ -374,10 +301,6 @@
                 </table>
             </div>
 
-            {{-- Paginacao --}}
-            <div class="px-6 py-4 border-t border-slate-200">
-                {{ $logs->links() }}
-            </div>
         @endif
-    </div>
+    </x-ui.card>
 </div>

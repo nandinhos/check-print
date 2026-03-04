@@ -1,4 +1,7 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+/* Declara a variante dark baseada na classe .dark no HTML */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -6,41 +9,249 @@
 @source '../**/*.js';
 @source '../../vendor/livewire/livewire/src/**/*.php';
 
+/* ---------------------------------------------------------
+   @theme — Registra os tokens no sistema do Tailwind 4.x
+   --------------------------------------------------------- */
 @theme {
-    /* Tipografia */
-    --font-sans: 'Inter', 'Roboto', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace;
+    /* Fontes — mapeiam para as variáveis CSS definidas no :root */
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-    /* Design System - Minimalismo Corporativo GAP */
+    /* Escala de cores da marca (referencia as variáveis CSS do :root) */
+    --color-brand-50: var(--brand-50);
+    --color-brand-100: var(--brand-100);
+    --color-brand-200: var(--brand-200);
+    --color-brand-300: var(--brand-300);
+    --color-brand-400: var(--brand-400);
+    --color-brand-500: var(--brand-500);
+    --color-brand-600: var(--brand-600);
+    --color-brand-700: var(--brand-700);
+    --color-brand-800: var(--brand-800);
+    --color-brand-900: var(--brand-900);
+    --color-brand-950: var(--brand-950);
 
-    /* Primary - Navy Blue */
-    --color-primary-50: #eff6ff;
-    --color-primary-100: #dbeafe;
-    --color-primary-200: #bfdbfe;
-    --color-primary-300: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-    --color-primary-700: #1d4ed8;
-    --color-primary-800: #1e40af;
-    --color-primary-900: #1e3a8a;
-    --color-primary-950: #172554;
+    /* Superfícies semânticas — mudam automaticamente com o tema */
+    --color-surface: var(--bg-surface);
+    --color-panel: var(--bg-panel);
+    --color-accent: var(--accent-color);
 
-    /* Background */
-    --color-app-bg: #f8fafc;
-
-    /* Semantic - Administrativo (Violeta) */
-    --color-admin: #8b5cf6;
-    --color-admin-bg: #f5f3ff;
-    --color-admin-border: #c4b5fd;
-
-    /* Semantic - Pessoal (Ambar) */
-    --color-personal: #f59e0b;
-    --color-personal-bg: #fffbeb;
-    --color-personal-border: #fcd34d;
-
-    /* Semantic - Erro */
-    --color-danger: #ef4444;
-    --color-danger-bg: #fef2f2;
-    --color-danger-border: #fca5a5;
+    /* Sombras nomeadas — usadas como `shadow-crystal` e `shadow-soft` */
+    --shadow-crystal: var(--shadow-crystal-val);
+    --shadow-soft: var(--soft-shadow-val);
 }
+
+/* ---------------------------------------------------------
+   @layer base — Tokens de tema e reset do body
+   --------------------------------------------------------- */
+@layer base {
+
+    /* TEMA LIGHT (padrão — sem nenhuma classe no HTML) */
+    :root {
+        /* Superfícies */
+        --bg-surface: #F8FAFC;
+        /* Fundo da página */
+        --bg-panel: rgba(255, 255, 255, 0.5);
+        /* Cards, painéis */
+        --bg-header: rgba(255, 255, 255, 0.65);
+        /* Header sticky */
+
+        /* Texto */
+        --text-main: #0F172A;
+        /* Primário — slate-900 */
+        --text-secondary: #334155;
+        /* Secundário — slate-700 (mais escuro para contraste) */
+        --text-muted: #64748B;
+        /* Silenciado — slate-500 */
+
+        /* Bordas de vidro */
+        --border-glass: rgba(255, 255, 255, 0.4);
+        /* Borda principal mais translúcida e sutil */
+        --border-subtle: rgba(0, 0, 0, 0.03);
+        /* Borda fina, quase invisível */
+
+        /* Cores de marca */
+        --brand-blue: #3B82F6;
+        --brand-teal: #14B8A6;
+        --accent-color: var(--brand-blue);
+
+        /* Sombras */
+        --shadow-crystal-val: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
+        /* Sombra mais profunda e suave */
+        --soft-shadow-val: 0 4px 20px -2px rgba(0, 0, 0, 0.05),
+            0 2px 10px -2px rgba(0, 0, 0, 0.03);
+
+        /* Escala de azul da marca (Light) */
+        --brand-50: #eff6ff;
+        --brand-100: #dbeafe;
+        --brand-200: #bfdbfe;
+        --brand-300: #93c5fd;
+        --brand-400: #60a5fa;
+        --brand-500: #3b82f6;
+        /* ← Primária da marca */
+        --brand-600: #2563eb;
+        --brand-700: #1d4ed8;
+        --brand-800: #1e40af;
+        --brand-900: #1e3a8a;
+        --brand-950: #172554;
+    }
+
+    /* TEMA DARK (ativo quando <html class="dark">) */
+    .dark {
+        /* Superfícies — fundo quase preto, como obsidiana */
+        --bg-surface: #020617;
+        /* Quase preto */
+        --bg-panel: rgba(2, 6, 23, 0.4);
+        /* Painel translúcido escuro */
+        --bg-header: rgba(2, 6, 23, 0.6);
+        /* Header mais opaco */
+
+        /* Texto — invertido */
+        --text-main: #F8FAFC;
+        --text-secondary: #94A3B8;
+        --text-muted: #475569;
+
+        /* Bordas — quase imperceptíveis sobre fundo escuro */
+        --border-glass: rgba(255, 255, 255, 0.05);
+        --border-subtle: rgba(255, 255, 255, 0.02);
+
+        /* Cores de marca — mais claras para contrastar com fundo escuro */
+        --brand-blue: #60A5FA;
+        --brand-teal: #2DD4BF;
+        --accent-color: var(--brand-blue);
+
+        /* Sombras — mais profundas no dark */
+        --shadow-crystal-val: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+        --soft-shadow-val: 0 4px 20px -2px rgba(0, 0, 0, 0.3),
+            0 2px 10px -2px rgba(0, 0, 0, 0.2);
+
+        /* Escala de azul da marca (Dark) — invertida */
+        --brand-50: #081222;
+        --brand-100: #0c1c38;
+        --brand-200: #10264e;
+        --brand-300: #143064;
+        --brand-400: #183a7a;
+        --brand-500: #3b82f6;
+        /* ← mantido igual para consistência */
+        --brand-600: #60a5fa;
+        --brand-700: #93c5fd;
+        --brand-800: #bfdbfe;
+        --brand-900: #dbeafe;
+        --brand-950: #eff6ff;
+    }
+
+    /* BODY — configuração base */
+    body {
+        background-color: var(--bg-surface);
+        color: var(--text-main);
+        font-family: var(--font-sans);
+        /* Suavização de fontes — obrigatório para o visual premium */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        /* Transição suave ao trocar tema */
+        transition: color 0.3s ease, background-color 0.3s ease;
+
+        /* Gradiente ambiental sutil — dá profundidade à página */
+        background-image:
+            radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.08) 0px, transparent 50%);
+    }
+
+    .dark body {
+        /* Gradiente mais presente no dark para criar atmosfera */
+        background-image:
+            radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.05) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(20, 184, 166, 0.05) 0px, transparent 50%);
+    }
+}
+
+/* ---------------------------------------------------------
+   @layer components — Classes reutilizáveis nomeadas
+   --------------------------------------------------------- */
+@layer components {
+
+    /* FROSTED GLASS — padrão base de todas as superfícies translúcidas */
+    .frosted-glass {
+        backdrop-filter: blur(28px) saturate(190%);
+        background-color: var(--bg-panel);
+        border: 1px solid var(--border-glass);
+        box-shadow: var(--shadow-crystal-val);
+    }
+
+    /* FROSTED HEADER — versão para header/navbar fixo no topo */
+    .frosted-header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background-color: var(--bg-header);
+        backdrop-filter: blur(32px) saturate(200%);
+        border-bottom: 1px solid var(--border-glass);
+    }
+
+    /* PREMIUM CARD — superfície principal de cards com efeito de difração */
+    .premium-card {
+        backdrop-filter: blur(28px) saturate(190%);
+        background-color: var(--bg-panel);
+        border: 1px solid var(--border-glass);
+        border-radius: 1.25rem;
+        box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.3),
+            /* Reflexo superior mais forte */
+            inset 0 0 40px rgba(255, 255, 255, 0.05),
+            /* Brilho interno mais amplo */
+            var(--shadow-crystal-val);
+        /* Sombra de profundidade */
+        transition: all 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .premium-card:hover {
+        transform: translateY(-2px);
+        /* Elevação sutil no hover */
+        box-shadow:
+            inset 0 1px 1px rgba(255, 255, 255, 0.4),
+            inset 0 0 60px rgba(255, 255, 255, 0.1),
+            0 30px 60px -12px rgba(0, 0, 0, 0.12);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* MONO TEXT — para logs, código, métricas e dados técnicos */
+    .mono-text {
+        font-family: var(--font-mono);
+        letter-spacing: -0.025em;
+        /* Comprime levemente para dados numéricos */
+    }
+}
+
+/* ---------------------------------------------------------
+   SCROLLBAR CUSTOMIZADA — discreta, combina com o tema
+   --------------------------------------------------------- */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    /* slate-300 */
+    border-radius: 9999px;
+    transition: background-color 0.2s;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background-color: #3f3f46;
+    /* zinc-700 */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+}
+
+/* slate-400 */
+.dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #52525b;
+}
+
+/* zinc-600 */
